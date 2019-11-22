@@ -1,3 +1,5 @@
+// import * as TMJ from './three.module';
+// import { Water } from './Water2';
 var camera, scene, renderer;
 var theta = 0;
 
@@ -5,16 +7,16 @@ init();
 animate();
 
 function init() {
-    //Äµ¹ö½º Å©±â
+    //Äµï¿½ï¿½ï¿½ï¿½ Å©ï¿½ï¿½
     var width = window.innerWidth;
     var height = window.innerHeight;
 
-    //·£´õ·¯
-    renderer = new THREE.WebGLRenderer({ antialias: true }); //antialias : ¿ÀºêÁ§½º °¡ÀåÀÚ¸® Ç¥Çö ¸Å²öÇÏ°Ô
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    renderer = new THREE.WebGLRenderer({ antialias: true }); //antialias : ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ú¸ï¿½ Ç¥ï¿½ï¿½ ï¿½Å²ï¿½ï¿½Ï°ï¿½
     renderer.setSize(width, height);
     document.body.appendChild(renderer.domElement);
 
-    //Àå¸é
+    //ï¿½ï¿½ï¿½
     scene = new THREE.Scene;
     var penguin = drawPeng(0, 100, 100);
     scene.add(penguin);
@@ -24,37 +26,90 @@ function init() {
     scene.add(bear);
     var shark = drawShark(0, -100, 100);
     scene.add(shark);
-    //Àå¸é¿¡ ¸Ş½Ã Ãß°¡
+    //ï¿½ï¿½é¿¡ ï¿½Ş½ï¿½ ï¿½ß°ï¿½
 
-    //Ä«¸Ş¶ó »ı¼º
-    //½Ã¾ß, Á¾È¾ºñ, ¹°Ã¼°ú Ä«¸Ş¶óÀÇ ÃÖÀú°Å¸®, ÃÖ´ë °Å¸®
+    //Ä«ï¿½Ş¶ï¿½ ï¿½ï¿½ï¿½ï¿½
+    //ï¿½Ã¾ï¿½, ï¿½ï¿½È¾ï¿½ï¿½, ï¿½ï¿½Ã¼ï¿½ï¿½ Ä«ï¿½Ş¶ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Å¸ï¿½, ï¿½Ö´ï¿½ ï¿½Å¸ï¿½
     camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 10000);
     camera.position.y = 300;
     camera.position.z = 0;
     camera.position.x = 300;
     camera.up.set(0, 0, 1);
     camera.lookAt(0, 0, 0);
-    scene.add(camera);//Àå¸é¿¡ Ä«¸Ş¶ó Ãß°¡
+    scene.add(camera);//ï¿½ï¿½é¿¡ Ä«ï¿½Ş¶ï¿½ ï¿½ß°ï¿½
 
 
-    //¹è°æ¿ë ¸Ş½Ã
+    //ï¿½ï¿½ï¿½ï¿½ ï¿½Ş½ï¿½
     var skyboxGeometry = new THREE.CubeGeometry(10000, 10000, 10000);
     var skyboxMaterial = new THREE.MeshBasicMaterial({ color: 0x555555, side: THREE.BackSide });
     var skybox = new THREE.Mesh(skyboxGeometry, skyboxMaterial);
 
-    scene.add(skybox);//Àå¸é¿¡ ¹è°æ Ãß°¡
+    scene.add(skybox);//ï¿½ï¿½é¿¡ ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
 
 
-    //Á¶¸í
+    //ï¿½ï¿½ï¿½ï¿½
     var pointLight = new THREE.PointLight(0xffffff);
     pointLight.position.set(300, 200, 200);
 
     scene.add(pointLight);
 
 
-    //·£´õ¸µ
+    // var textureloader = new TMJ.TextureLoader();
+    // textureLoader.load('./ocean/textures/floors/FloorsCheckerboard_S_Diffuse.jpg', function (map) {
+
+    //     map.wrapS = THREE.RepeatWrapping;
+    //     map.wrapT = THREE.RepeatWrapping;
+    //     map.anisotropy = 16;
+    //     map.repeat.set(4, 4);
+    //     groundMaterial.map = map;
+    //     groundMaterial.needsUpdate = true;
+
+    // });
+
+  
+
+
+    /* Water */
+    //ì²˜ìŒ 2ê°œê¹Œì§€ë¡œë§Œ í¬ê¸° ì¡°ì ˆ.
+
+    var waterGeo = new THREE.PlaneGeometry(800, 2000, 50, 50);
+    var waterMat = new THREE.MeshPhongMaterial({
+        color: 0x3366CC,
+        emissive: 0x009999,
+        shading: THREE.FlatShading,
+        shininess: 60,
+        specular: 30,
+        transparent: true
+    });
+
+    for (var j = 0; j < waterGeo.vertices.length; j++) {
+        waterGeo.vertices[j].x = waterGeo.vertices[j].x + ((Math.random() * Math.random()) * 30);
+        waterGeo.vertices[j].y = waterGeo.vertices[j].y + ((Math.random() * Math.random()) * 20);
+    }
+
+    var waterObj = new THREE.Mesh(waterGeo, waterMat);
+    waterObj.position.z-=80
+    scene.add(waterObj);
+
+
+
+    var count = 0;
+
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     var animate = function () {
         requestAnimationFrame(animate);
+
+        var particle, i = 0;
+        for (var ix = 0; ix < 50; ix++) {
+            for (var iy = 0; iy < 50; iy++) {
+                waterObj.geometry.vertices[i++].z = (Math.sin((ix + count) * 2) * 3) +
+                    (Math.cos((iy + count) * 1.5) * 6);
+                waterObj.geometry.verticesNeedUpdate = true;
+            }
+        }
+
+        count += 0.02;
+
         
         theta += 0.01;
         //penguin.position.x = theta * 100;
