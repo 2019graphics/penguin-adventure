@@ -60,19 +60,19 @@ function drawShark(xOffset, yOffset, zOffset) {
 	Geometry = new THREE.CubeGeometry(60, 90, 8);
 	Material = new THREE.MeshLambertMaterial({ color: 0xffffff });
 	mesh = new THREE.Mesh(Geometry, Material);
-	mesh.position.set(84 + xOffset, 0 + yOffset, -10 + zOffset);
+	mesh.position.set(84 + xOffset, 0 + yOffset, -12 + zOffset);
 	group.add(mesh);
 
 	// 이빨
 	mesh = new THREE.Mesh(Geometry, Material);
-	mesh.position.set(84 + xOffset, 0 + yOffset, -30 + zOffset);
+	mesh.position.set(84 + xOffset, 0 + yOffset, -28 + zOffset);
 	group.add(mesh);
 
 	// 턱 
 	Geometry = new THREE.CubeGeometry(201, 101, 20);
 	Material = new THREE.MeshLambertMaterial({ color: 0x708090 });
 	mesh = new THREE.Mesh(Geometry, Material);
-	mesh.position.set(20 + xOffset, 0 + yOffset, -40 + zOffset);
+	mesh.position.set(15 + xOffset, 0 + yOffset, -40 + zOffset);
 	group.add(mesh);
    
     //오른쪽 지느러미 
