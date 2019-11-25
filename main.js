@@ -73,7 +73,23 @@ function meshAdd() {
     scene.add(bear);
     shark = drawShark(0, -200, 200);
     scene.add(shark);
+
+    //cloud
+    
+    var cloud1 = drawCloud(200, -1000, 390);
+    scene.add(cloud1);
+    var cloud2 = drawCloud(-400, 400, 400);
+    scene.add(cloud2);
+    var cloud3 = drawCloud(-900, 0, 410);
+    scene.add(cloud3);
+    var cloud4 = drawCloud(100, -700, 430);
+    scene.add(cloud4);
+    var cloud5 = drawCloud(50, 300, 420);
+    scene.add(cloud5);
+    
 }
+
+
 
 function init() {
     //size
@@ -98,9 +114,9 @@ function init() {
 
     //background
     var skyboxGeometry = new THREE.CubeGeometry(maxX, maxY, maxZ);
-    var skyboxMaterial = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, side: THREE.BackSide });
+    var skyboxMaterial = new THREE.MeshBasicMaterial({ color: 0xADD8E6, side: THREE.BackSide });
     var skybox = new THREE.Mesh(skyboxGeometry, skyboxMaterial);
-    skybox.position.set(1000, 0, 0);
+    skybox.position.set(1000,0,0);
     scene.add(skybox);
 
     //light
@@ -183,8 +199,8 @@ function init() {
         
 
         camera.position.set(2000, -2000, 1500);
-        //camera.position.y = Math.cos(theta)*2000;
-        //camera.position.x = Math.sin(theta)*2000;
+        camera.position.y = Math.cos(theta)*2000;
+        camera.position.x = Math.sin(theta)*2000;
         camera.lookAt(0, 0, 0);
 
 
