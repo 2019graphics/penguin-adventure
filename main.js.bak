@@ -36,7 +36,7 @@ function init() {
 	scene.add(ice);
 	
 	//여러개 만들어서 없애는거 못하겠우ㅠㅍㅠ
-	for (i=0;i<1 ;i++ )
+	for (i=0;i<3 ;i++ )
 	{
 		var snowball = drawSnowBall(Math.random()*500, Math.random()*500, Math.random()*500);
 		scene.add(snowball);
