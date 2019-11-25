@@ -86,6 +86,10 @@ function meshAdd() {
     scene.add(cloud4);
     var cloud5 = drawCloud(50, 300, 420);
     scene.add(cloud5);
+
+    //items
+    var item= drawItem(0,0,40)
+    scene.add(item)
     
 }
 
@@ -107,7 +111,7 @@ function init() {
 
     //camera
 	camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 10000);
-	camera.position.set(-1000, -1000, 1000);
+    camera.position.set(-1000, -1000, 1000);
     camera.up.set(0, 0, 1);
     camera.lookAt(0, 0, 0);
     scene.add(camera);
