@@ -2,8 +2,10 @@ var camera, scene, renderer;
 var theta = 0;
 
 //meshs
-var icebergs, penguin, seal, bear, shark, snowballs;
+var icebergs, penguin, seal, bear, shark, snowballs,item;
 var snowCount = 10;
+
+var collidableMeshList = [];
 
 //size
 var maxX = 2000, maxY = 2000, maxZ = 1000;
@@ -14,26 +16,23 @@ init();
 function randCom(total, object) {
     //total개 중에 object개 뽑기
 
-    var lotto = new Array(object); // 6개의 배열이 lotto에 저장
-    var count = 0; //추출한 로또번호의 갯수
-    var overl = true; // 번호중복 여부 변수
+    var lotto = new Array(object); 
+    var count = 0; 
+    var overl = true; 
  
-    while (count < object) { // 로또번호 6번 얻을 때까지 반복.
-        var number = 0; //랜덤번호 가져오는 변수
-        number = parseInt(Math.random() * total) + 1; // 1~45사이에 랜덤번호 추출
- 
-        for (var i = 0; i < count; i++) { // 1부터 i까지 반복하여 중복확인
-            if (lotto[i] == number) { // 중복된 번호가 아니면 넘어가기.
+    while (count < object) { 
+        var number = 0; 
+        number = parseInt(Math.random() * total) + 1; 
+        for (var i = 0; i < count; i++) { 
+            if (lotto[i] == number) { 
                 overl = false;
             }
         }
- 
-        if (overl) { //중복 없을 시 count 1 증가
-            lotto[count] = number; //추출된 번호를 배열에 넣기
+        if (overl) { 
+            lotto[count] = number; 
             count++;
         }
- 
-        overl = true; //원래 true으로 돌아가기
+        overl = true; 
     }
     return lotto;
 }
@@ -43,6 +42,7 @@ function remove(id) {
   scene.remove(scene.getObjectByName(id));
 }
 
+//mesh 장면에 추가
 function meshAdd() {
     /*iceberg*/
     icebergs = [];
@@ -75,7 +75,6 @@ function meshAdd() {
     scene.add(shark);
 
     //cloud
-    
     var cloud1 = drawCloud(200, -1000, 390);
     scene.add(cloud1);
     var cloud2 = drawCloud(-400, 400, 400);
@@ -88,9 +87,10 @@ function meshAdd() {
     scene.add(cloud5);
 
     //items
-    var item= drawItem(0,0,40)
-    scene.add(item)
-    
+    item = drawItem(0, 0, 40);
+    scene.add(item);
+    collidableMeshList.push(item)
+
 }
 
 
@@ -124,15 +124,16 @@ function init() {
     scene.add(skybox);
 
     //light
+    //뒤쪽 조명
     var Light = new THREE.DirectionalLight(0xffffff,0.8);
     //var pointLight = new THREE.PointLight(0xffffff);
     Light.position.set(-500, -250, 350);
     scene.add(Light);
-
+    //앞쪽조명
     var Light2 = new THREE.DirectionalLight(0xffffff, 0.6);
     Light2.position.set(500, 250, 350);
     scene.add(Light2);
-
+    //위쪽 조명
     var Light3 = new THREE.DirectionalLight(0xffffff, 0.1);
     Light3.position.set(0, 0, maxZ);
     scene.add(Light3);
@@ -166,9 +167,10 @@ function init() {
 
 
 
-
+    //움직임
     var animate = function () {
-        requestAnimationFrame(animate);
+        setTimeout(
+        requestAnimationFrame(animate),100);
         theta += 0.01;
 
         //wave
@@ -193,14 +195,6 @@ function init() {
         }
         */
 
-        //penguin move
-        var pengx = (theta * 200) % maxX;
-        penguin.position.x = pengx;
-        pengx %= 100;
-        var pengz = -1 * (pengx - 50) * (pengx - 50) + 2500;
-        pengz /= 50;
-        penguin.position.z = pengz;
-        
 
         camera.position.set(2000, -2000, 1500);
         camera.position.y = Math.cos(theta)*2000;
@@ -209,6 +203,48 @@ function init() {
 
 
         renderer.render(scene, camera);
+        movePengForward();
+
+        firstBB=new THREE.Box3().setFromObject(penguin);
+        secondBB=new THREE.Box3().setFromObject(item);
+
+        var coll=firstBB.isIntersectionBox(secondBB);
+
+        if(coll){
+            bear.position.x=200;
+        }
+
+
+        // var originPoint = penguin.position.clone();
+        
+
+        // for (var vertexIndex = 0; vertexIndex < penguin.geometry.vertices.length; vertexIndex++) {
+        //     var localVertex = penguin.geometry.vertices[vertexIndex].clone();
+        //     var globalVertex = localVertex.applyMatrix4(penguin.matrix);
+        //     var directionVector = globalVertex.sub(penguin.position);
+
+        //     var ray = new THREE.Raycaster(originPoint, directionVector.clone().normalize());
+        //     var collisionResults = ray.intersectObjects(collidableMeshList);
+            
+        //     if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()){
+        //         bear.position.x=200
+        //         document.getElementById('message').innerHTML += 'HIT';
+
+        //     }      
+        //   }	    
+
     }
     animate();
+    function movePengForward() {
+        //penguin move
+        var pengx = (theta * 200) % maxX;
+        penguin.position.x = pengx;
+        pengx %= 100;
+        var pengz = -1 * (pengx - 50) * (pengx - 50) + 2500;
+        pengz /= 50;
+        penguin.position.z = pengz;
+
+        
+    }
+
 }
