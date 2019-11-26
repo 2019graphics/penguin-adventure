@@ -36,21 +36,6 @@ function randCom(total, object) {
     }
     return lotto;
 }
-function collision(){
-    firstBB=new THREE.Box3().setFromObject(penguin);
-
-    for(index=0;index<collidableMeshList.length;index++){
-        secondBB=new THREE.Box3().setFromObject(collidableMeshList[index]);
-        var coll=firstBB.isIntersectionBox(secondBB);
-        if(coll){
-            collidableMeshList.splice(index,1);
-            return 1;
-
-        }
-
-    }
-    return 0;
-}
 
 //mesh remove
 function remove(id) {
@@ -242,11 +227,33 @@ function init() {
         renderer.render(scene, camera);
         movePengForward();
 
-        //충돌하면 return 1 그리고 list에서 해당 object 제외.
+        firstBB=new THREE.Box3().setFromObject(penguin);
+        secondBB=new THREE.Box3().setFromObject(item);
 
-        if(collision()==1){
+        var coll=firstBB.isIntersectionBox(secondBB);
+
+        if(coll){
             bear.position.x=200;
         }
+
+
+        // var originPoint = penguin.position.clone();
+        
+
+        // for (var vertexIndex = 0; vertexIndex < penguin.geometry.vertices.length; vertexIndex++) {
+        //     var localVertex = penguin.geometry.vertices[vertexIndex].clone();
+        //     var globalVertex = localVertex.applyMatrix4(penguin.matrix);
+        //     var directionVector = globalVertex.sub(penguin.position);
+
+        //     var ray = new THREE.Raycaster(originPoint, directionVector.clone().normalize());
+        //     var collisionResults = ray.intersectObjects(collidableMeshList);
+            
+        //     if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()){
+        //         bear.position.x=200
+        //         document.getElementById('message').innerHTML += 'HIT';
+
+        //     }      
+        //   }	    
 
     }
     animate();
