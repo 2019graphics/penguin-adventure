@@ -2,8 +2,10 @@ var camera, scene, renderer;
 var theta = 0;
 
 //meshs
-var icebergs, penguin, seal, bear, shark, snowballs;
+var icebergs, penguin, seal, bear, shark, snowballs,item;
 var snowCount = 10;
+
+var collidableMeshList = [];
 
 //size
 var maxX = 2000, maxY = 2000, maxZ = 1000;
@@ -85,8 +87,10 @@ function meshAdd() {
     scene.add(cloud5);
 
     //items
-    var item = drawItem(0, 0, 40);
+    item = drawItem(0, 0, 40);
     scene.add(item);
+    collidableMeshList.push(item)
+
 }
 
 //water 생성
@@ -114,10 +118,8 @@ function setWater() {
 }
 
 
-//-----------------------------------------------------------
+
 function init() {
-
-
     //size
     var width = window.innerWidth;
     var height = window.innerHeight;
@@ -126,8 +128,7 @@ function init() {
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(width, height);
     document.body.appendChild(renderer.domElement);
-    renderer.gammaOutput = true;
-    
+
     //mesh add
     scene = new THREE.Scene;
     meshAdd();
@@ -139,7 +140,7 @@ function init() {
     camera.lookAt(0, 0, 0);
     scene.add(camera);
 
-    //--배경
+     //--배경
     
     var materialArray = [];
     var texture_ft = new THREE.TextureLoader().load('img/fadeaway_ft.jpg');
@@ -158,11 +159,13 @@ function init() {
     
     //여기까지----
 
-    //background
+   //background
     var skyboxGeometry = new THREE.BoxGeometry(maxX + 1, maxY + 1, maxZ);
     var skybox = new THREE.Mesh(skyboxGeometry, materialArray);
     skybox.position.set(1000, 50, 0);
     scene.add(skybox);
+
+
 
     //light
     //뒤쪽 조명
@@ -184,7 +187,6 @@ function init() {
     var waterObj = setWater();
     waterObj.position.set(1000, 50, -80);
     scene.add(waterObj);
-
 
 
     //움직임
@@ -215,14 +217,44 @@ function init() {
         }
         */
 
-        movePengForward();
-        camera.position.set(1000, -1000, 300);
-        camera.position.y = Math.cos(theta)*1500;
-        camera.position.x = Math.sin(theta)*1500;
+
+        camera.position.set(2000, -2000, 1500);
+        camera.position.y = Math.cos(theta)*2000;
+        camera.position.x = Math.sin(theta)*2000;
         camera.lookAt(0, 0, 0);
 
 
         renderer.render(scene, camera);
+        movePengForward();
+
+        firstBB=new THREE.Box3().setFromObject(penguin);
+        secondBB=new THREE.Box3().setFromObject(item);
+
+        var coll=firstBB.isIntersectionBox(secondBB);
+
+        if(coll){
+            bear.position.x=200;
+        }
+
+
+        // var originPoint = penguin.position.clone();
+        
+
+        // for (var vertexIndex = 0; vertexIndex < penguin.geometry.vertices.length; vertexIndex++) {
+        //     var localVertex = penguin.geometry.vertices[vertexIndex].clone();
+        //     var globalVertex = localVertex.applyMatrix4(penguin.matrix);
+        //     var directionVector = globalVertex.sub(penguin.position);
+
+        //     var ray = new THREE.Raycaster(originPoint, directionVector.clone().normalize());
+        //     var collisionResults = ray.intersectObjects(collidableMeshList);
+            
+        //     if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()){
+        //         bear.position.x=200
+        //         document.getElementById('message').innerHTML += 'HIT';
+
+        //     }      
+        //   }	    
+
     }
     animate();
     function movePengForward() {
@@ -233,6 +265,8 @@ function init() {
         var pengz = -1 * (pengx - 50) * (pengx - 50) + 2500;
         pengz /= 50;
         penguin.position.z = pengz;
+
+        
     }
 
 }
