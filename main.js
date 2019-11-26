@@ -48,7 +48,7 @@ function meshAdd() {
     icebergs = [];
     iceLoc = randCom(20, 10);
     for (var i = 0; i < 10; i++) {
-        var ice = drawIce(iceLoc[i]*100, 0, 0);
+        var ice = drawIce(iceLoc[i]*100-50, 0, 0);
         icebergs.push(ice);
         scene.add(ice);
     }
@@ -93,6 +93,30 @@ function meshAdd() {
 
 }
 
+//water 생성
+function setWater() {
+    /* Water */
+    //처음 2개까지로만 크기 조절.
+    var waterGeo = new THREE.PlaneGeometry(maxX, maxY, 50, 50);
+    var waterMat = new THREE.MeshPhongMaterial({
+        color: 0x3366CC,
+        emissive: 0x009999,
+        opacity: 0.5,
+        shading: THREE.FlatShading,
+        shininess: 60,
+        specular: 30,
+        transparent: true
+    });
+
+    for (var j = 0; j < waterGeo.vertices.length; j++) {
+        waterGeo.vertices[j].x = waterGeo.vertices[j].x + ((Math.random() * Math.random()) * 30);
+        waterGeo.vertices[j].y = waterGeo.vertices[j].y + ((Math.random() * Math.random()) * 20);
+    }
+
+    var waterObj = new THREE.Mesh(waterGeo, waterMat);
+    return waterObj;
+}
+
 
 
 function init() {
@@ -116,12 +140,32 @@ function init() {
     camera.lookAt(0, 0, 0);
     scene.add(camera);
 
-    //background
-    var skyboxGeometry = new THREE.CubeGeometry(maxX, maxY, maxZ);
-    var skyboxMaterial = new THREE.MeshBasicMaterial({ color: 0xADD8E6, side: THREE.BackSide });
-    var skybox = new THREE.Mesh(skyboxGeometry, skyboxMaterial);
-    skybox.position.set(1000,0,0);
+     //--배경
+    
+    var materialArray = [];
+    var texture_ft = new THREE.TextureLoader().load('img/fadeaway_ft.jpg');
+    var texture_bk = new THREE.TextureLoader().load('img/fadeaway_bk.jpg');
+    var texture_up = new THREE.TextureLoader().load('img/fadeaway_up.jpg');
+    var texture_dn = new THREE.TextureLoader().load('img/fadeaway_dn.jpg');
+    var texture_rt = new THREE.TextureLoader().load('img/fadeaway_rt.jpg');
+    var texture_lf = new THREE.TextureLoader().load('img/fadeaway_lf.jpg');
+    
+    materialArray.push(new THREE.MeshBasicMaterial({ map: texture_ft, side: THREE.BackSide }));
+    materialArray.push(new THREE.MeshBasicMaterial({ map: texture_bk, side: THREE.BackSide }));
+    materialArray.push(new THREE.MeshBasicMaterial({ map: texture_up, side: THREE.BackSide }));
+    materialArray.push(new THREE.MeshBasicMaterial({ map: texture_dn, side: THREE.BackSide }));
+    materialArray.push(new THREE.MeshBasicMaterial({ map: texture_rt, side: THREE.BackSide }));
+    materialArray.push(new THREE.MeshBasicMaterial({ map: texture_lf, side: THREE.BackSide }));
+    
+    //여기까지----
+
+   //background
+    var skyboxGeometry = new THREE.BoxGeometry(maxX + 1, maxY + 1, maxZ);
+    var skybox = new THREE.Mesh(skyboxGeometry, materialArray);
+    skybox.position.set(1000, 50, 0);
     scene.add(skybox);
+
+
 
     //light
     //뒤쪽 조명
@@ -140,31 +184,9 @@ function init() {
 
 
 
-
-
-
-    /* Water */
-    //처음 2개까지로만 크기 조절.
-    var waterGeo = new THREE.PlaneGeometry(maxX, maxY, 50, 50);
-    var waterMat = new THREE.MeshPhongMaterial({
-        color: 0x3366CC,
-        emissive: 0x009999,
-        opacity: 0.5,
-        shading: THREE.FlatShading,
-        shininess: 60,
-        specular: 30,
-        transparent: true
-    });
-
-    for (var j = 0; j < waterGeo.vertices.length; j++) {
-        waterGeo.vertices[j].x = waterGeo.vertices[j].x + ((Math.random() * Math.random()) * 30);
-        waterGeo.vertices[j].y = waterGeo.vertices[j].y + ((Math.random() * Math.random()) * 20);
-    }
-
-    var waterObj = new THREE.Mesh(waterGeo, waterMat);
-    waterObj.position.set(1000, 0, -80);
+    var waterObj = setWater();
+    waterObj.position.set(1000, 50, -80);
     scene.add(waterObj);
-
 
 
     //움직임
