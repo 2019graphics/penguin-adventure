@@ -181,21 +181,21 @@ function meshAdd() {
         scene.add(ice);
     }
 
+
     /*snowball*/
     //ver 1. create a snowball
-    /*
+
     snowballs = [];
-    for (var i = 0; i < snowCount ; i++) {
-        var snowball = drawSnowBall(Math.random() * 500, Math.random() * 500, Math.random() * 500);
+    for (var i = 0; i < snowCount; i++) {
+        var snowball = drawSnowBall(Math.random() * maxX, Math.random() * maxY - 1000, 500);
         snowballs.push(snowball);
         scene.add(snowball);
     }
-    */
 
     penguin = drawPeng(0, 0, -40);
     penguin.scale.set(0.8, 0.8, 0.8);
     scene.add(penguin);
-    
+
 
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
     random_distance = Math.random() * 500 + 300;
@@ -338,22 +338,20 @@ function init() {
             }
         }
 
-        //snowball
-        /*
-        for (i = 0; i < snowCount ; i++) {
-            //alert(snowballs[i].position.z);
-            snowballs[i].position.z -= 3;
-            if (snowballs[i].position.z <= -200) {
-                snowballs[i].position.z = 11000;
-            }
-        }
-        */
 
-       for(var i=0;i<26;i++)
-       {
-       
-           randommove(random_v[i]);
-       } 
+        for (var i = 0; i < 26; i++) {
+
+            randommove(random_v[i]);
+        }
+        //snowball
+        for (var j = 0; j < snowCount; j++) {
+            var speed = Math.random() * 30 + 1;
+            if (snowballs[j].position.z <= -500) {
+                snowballs[j].position.z = 500;
+            }
+            snowballs[j].position.z -= speed;
+        }
+
 
 
 
