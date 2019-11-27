@@ -13,6 +13,13 @@ var random_distance = 0;
 var superPenguinState = 0;
 var currentSuperPenguinTime;
 
+var t0 = 0;
+var t1 = 0;
+var pengSpeed = 10;
+
+var lockPeng = -1;//움직여도 되는 상태
+var startPoint = -1;
+
 //meshs
 var icebergs, penguin, seal, bear, shark, snowballs, item;
 var snowCount = 10;
@@ -26,10 +33,12 @@ score = {
 
 scoreBoard=document.getElementById('scoreBoard');
 
+
 //size
-var maxX = 2000, maxY = 2000, maxZ = 1000;
+var maxX = 4000, maxY = 4000, maxZ = 2000;
 
 init();
+
 function addPoint(){
     score[player1]++;
     console.log(score);
@@ -38,6 +47,7 @@ function updateScoreBoard() {
     scoreBoard.innerHTML='Score: '+score.player1;
     console.log(score);
 }
+
 
 //조합
 function randCom(total, object) {
@@ -189,8 +199,8 @@ function randommove(randomObject) {
 function meshAdd() {
     /*iceberg*/
     icebergs = [];
-    iceLoc = randCom(20, 10);
-    for (var i = 0; i < 10; i++) {
+    iceLoc = randCom(40, 30);
+    for (var i = 0; i < 20; i++) {
         var ice = drawIce(iceLoc[i] * 100 - 50, 0, 0);
         icebergs.push(ice);
         scene.add(ice);
@@ -279,6 +289,7 @@ function init() {
     renderer.setClearColor(0x9999BB, 1);
     container.appendChild(renderer.domElement);
 
+
     //mesh add
     scene = new THREE.Scene;
     meshAdd();
@@ -291,7 +302,6 @@ function init() {
     scene.add(camera);
 
     //--배경
-
     var materialArray = [];
     var texture_ft = new THREE.TextureLoader().load('img/fadeaway_ft.jpg');
     var texture_bk = new THREE.TextureLoader().load('img/fadeaway_bk.jpg');
@@ -306,13 +316,12 @@ function init() {
     materialArray.push(new THREE.MeshBasicMaterial({ map: texture_dn, side: THREE.BackSide }));
     materialArray.push(new THREE.MeshBasicMaterial({ map: texture_rt, side: THREE.BackSide }));
     materialArray.push(new THREE.MeshBasicMaterial({ map: texture_lf, side: THREE.BackSide }));
-
     //여기까지----
 
     //background
     var skyboxGeometry = new THREE.BoxGeometry(maxX + 1, maxY + 1, maxZ);
     var skybox = new THREE.Mesh(skyboxGeometry, materialArray);
-    skybox.position.set(1000, 50, 0);
+    skybox.position.set(maxX/2, 50, 0);
     scene.add(skybox);
 
 
@@ -332,17 +341,20 @@ function init() {
     Light3.position.set(0, 0, maxZ);
     scene.add(Light3);
 
-
-
+    //파도
     var waterObj = setWater();
-    waterObj.position.set(1000, 50, -80);
+    waterObj.position.set(maxX/2, 50, -80);
     scene.add(waterObj);
+
+
+
+
+
 
 
     //움직임
     var animate = function () {
-        setTimeout(
-            requestAnimationFrame(animate), 100);
+        setTimeout(requestAnimationFrame(animate), 100);
         theta += 0.01;
 
         //wave
@@ -367,33 +379,37 @@ function init() {
         }
         */
 
+        //장애물 움직이기
        for(var i=0;i<26;i++)
        {
-       
            randommove(random_v[i]);
        } 
 
-
-
-
-        camera.position.set(5000, 0, 1500);
+        camera.position.set(penguin.position.x - 1000, penguin.position.y - 200, 1000);
+        //camera.position.set(-5000, 300, 2000);
         //camera.position.y = Math.cos(theta)*2000;
         //camera.position.x = Math.sin(theta)*2000;
-        camera.lookAt(0, 0, 0);
+        camera.lookAt(penguin.position.x+300, penguin.position.y, 0);
 
+        //펭귄 움직이기
+        moveForward();
+        checkSuper();
 
-        movePengForward(penguin);
+        //movePengForward(penguin);
         //contraryPenguin(penguin);
-
-
-
-        updateScoreBoard();
-        renderer.render(scene, camera);
-
+		updateScoreBoard();
+        
+		renderer.render(scene, camera);
 
         //충돌하면 return 1 그리고 list에서 해당 object 제외.
         //item effect
+        
+        //충돌하면 return 1 그리고 list에서 해당 object 제외.
+        //item effect
         if (collision() == 1) {
+            t1 = performance.now() / 1000;
+            console.log('t1', t1);
+
             //var itemRandNum = Math.floor(Math.random()*10);
             var itemRandNum = 0
             if (itemRandNum == 0) {
@@ -408,6 +424,83 @@ function init() {
 
     }
 
+    document.addEventListener("keydown", onDocumentKeyDown, false);
+    function onDocumentKeyDown(event) {
+        var keyCode = event.which;
+        if (keyCode == 37)   //right
+        {
+            if (superPenguinState == 0) {
+                if (penguin.position.y < 1000) {
+                    penguin.position.y += 100;
+                }
+            }
+            else {
+                if (penguin.position.y < 900) {
+                    penguin.position.y += 100;
+                }
+
+            }
+
+        }
+        if (keyCode == 39)   //left
+        {
+            if (superPenguinState == 0) {
+                if (penguin.position.y > -1050) {
+                    penguin.position.y -= 100;
+                }
+            }
+            else {
+                if (penguin.position.y > -950) {
+                    penguin.position.y -= 100;
+                }
+
+            }
+        }
+        if (keyCode == 38)   //front
+        {
+            lockPeng = 1;//움직이는 상태로 변환
+        }
+    }
+    function checkSuper() {
+        if (superPenguinState == 1) {
+            pengSpeed = 20;
+            t0 = performance.now() / 1000;
+            console.log('t0', t0);
+        }
+        if (t0 - t1 >= 10) {
+            penguin.scale.set(0.8, 0.8, 0.8);
+            pengSpeed = 10;
+        }
+    }
+    function moveForward() {
+        if (lockPeng == 1) {//움직이는 상태 = 키보드 입력 받으면 안됨 = 움직이는 동작 수행
+            if (startPoint == -1)//이동 시작
+            {
+                startPoint = penguin.position.x;//펭귄 이동이 시작한 곳
+            }
+
+            var pengx = penguin.position.x + pengSpeed;
+            if (pengx >= maxX) {
+                penguin.position.x %= maxX;
+            }
+            if (startPoint + 100 < pengx-5) {
+                startPoint = -1;
+                lockPeng = -1;
+                return;
+            }
+
+            penguin.position.x = pengx;
+            pengx %= 100;
+            var pengz = -1 * (pengx - 50) * (pengx - 50) + 2500;
+            pengz /= 50;
+            penguin.position.z = pengz;
+        }
+
+        
+    }
+
+
+    //랜더링 시작
     animate();
 
     function movePengForward(penguin) {
@@ -422,11 +515,13 @@ function init() {
             var keyCode = event.which;
             if (keyCode == 37)   //right
             {
-                penguin.position.y += ySpeed / theta;
+                penguin.position.y += ySpeed / theta;;
+                //alert(penguin.position.y);
             }
             if (keyCode == 39)   //left
             {
-                penguin.position.y -= ySpeed / theta;
+                penguin.position.y -= ySpeed / theta;;
+                //alert(penguin.position.y);
             }
             if (keyCode == 38)   //front
             {
@@ -439,11 +534,13 @@ function init() {
                 var pengz = -1 * (pengx - 50) * (pengx - 50) + 2500;
                 pengz /= 50;
                 penguin.position.z = pengz;
-    */
+                */
+                
                 penguin.position.x += xSpeed / theta;
                 if (penguin.position.x > maxX) {
                     penguin.position.x %= maxX;
                 }
+                
             }
         }
 
@@ -452,7 +549,6 @@ function init() {
         }
 
     }
-
     function superPenguin(penguin) {
         penguin.scale.set(2.0, 2.0, 2.0);
     }
@@ -473,6 +569,10 @@ function init() {
             }
             if (keyCode == 38)   //front
             {
+                penguin.position.x += xSpeed / theta;
+                if (penguin.position.x > maxX) {
+                    penguin.position.x %= maxX;
+                }
                 //TODO:뛰는건 아직...
                 /*
                 //penguin move
@@ -482,11 +582,9 @@ function init() {
                 var pengz = -1 * (pengx - 50) * (pengx - 50) + 2500;
                 pengz /= 50;
                 penguin.position.z = pengz;
-    */
-                penguin.position.x += xSpeed / theta;
-                if (penguin.position.x > maxX) {
-                    penguin.position.x %= maxX;
-                }
+                */
+
+                
             }
         }
     }
