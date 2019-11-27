@@ -1,4 +1,4 @@
-var camera, scene, renderer;
+var camera, scene, renderer,container,scoreBoard;
 var theta = 0;
 var random_v = [];
 var seal = [];
@@ -19,10 +19,25 @@ var snowCount = 10;
 
 var collidableMeshList = [];
 
+score = {
+    player1: 0,
+    player2: 0
+  };
+
+scoreBoard=document.getElementById('scoreBoard');
+
 //size
 var maxX = 2000, maxY = 2000, maxZ = 1000;
 
 init();
+function addPoint(){
+    score[player1]++;
+    console.log(score);
+  }
+function updateScoreBoard() {
+    scoreBoard.innerHTML='Score: '+score.player1;
+    console.log(score);
+}
 
 //조합
 function randCom(total, object) {
@@ -257,9 +272,12 @@ function init() {
     var height = window.innerHeight;
 
     //render
+    container = document.getElementById('container');
+
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(width, height);
-    document.body.appendChild(renderer.domElement);
+    renderer.setClearColor(0x9999BB, 1);
+    container.appendChild(renderer.domElement);
 
     //mesh add
     scene = new THREE.Scene;
@@ -369,7 +387,7 @@ function init() {
 
 
 
-
+        updateScoreBoard();
         renderer.render(scene, camera);
 
 
