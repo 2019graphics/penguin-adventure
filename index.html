@@ -1,24 +1,48 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <link rel="stylesheet" href="style.css">
-  <script src="three.js"></script>
+	<link rel="stylesheet" href="style.css">
+	<script src="three.js"></script>
+	<style>
+		#btn{
+			border-top-left-radius: 5px; 
+			border-bottom-left-radius: 5px; 
+			border-top-right-radius: 5px; 
+			border-bottom-right-radius: 5px; 
+			border: 1px solid skyblue; 
+			background-color: rgba(0,0,0,0); 
+			color: skyblue; 
+			padding: 5px; 
+			width:600px;
+		}
+
+	</style>
 
 </head>
+
 <body>
+	<div>
+		<center>
+			<button id="btn">
+					<h3 id="scoreBoard"></h3>
+			</button>
+			<div id="container"></div>
 
-	<h3 id="scoreBoard"></h3>
-	<script src='objects/seal.js'></script>
-	<script src='objects/penguin.js'></script>
-	<script src='objects/bear.js'></script>
-	<script src='objects/shark.js'></script>
-	<script src='objects/ice.js'></script>
-	<script src='objects/snowball.js'></script>
-	<script src='objects/cloud.js'></script>
-	<script src='objects/item.js'></script>
+		</center>
 
-    <div id="container"></div>
-	<script src="main.js"></script>
+
+		<script src='objects/seal.js'></script>
+		<script src='objects/penguin.js'></script>
+		<script src='objects/bear.js'></script>
+		<script src='objects/shark.js'></script>
+		<script src='objects/ice.js'></script>
+		<script src='objects/snowball.js'></script>
+		<script src='objects/cloud.js'></script>
+		<script src='objects/item.js'></script>
+
+		<script src="main.js"></script>
 
 </body>
+
 </html>

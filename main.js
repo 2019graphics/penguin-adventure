@@ -21,30 +21,28 @@ var lockPeng = -1;//움직여도 되는 상태
 var startPoint = -1;
 
 //meshs
-var icebergs, penguin, seal, bear, shark, snowballs, item;
+var icebergs, snowballs, item;
 var snowCount = 10;
 
 var collidableMeshList = [];
+var itemList=[];
 
-score = {
-    player1: 0,
-    player2: 0
-  };
+var score=0;
+var stage=1;
 
 scoreBoard=document.getElementById('scoreBoard');
 
 
 //size
-var maxX = 4000, maxY = 4000, maxZ = 2000;
+var maxX = 4000, maxY = 4000, maxZ = 4000;
 
 init();
 
 function addPoint(){
-    score[player1]++;
-    console.log(score);
-  }
+    score+=stage*100;
+}
 function updateScoreBoard() {
-    scoreBoard.innerHTML='Score: '+score.player1;
+    scoreBoard.innerHTML='Score: '+score+'(Stage: '+stage+')';
     console.log(score);
 }
 
@@ -73,6 +71,24 @@ function randCom(total, object) {
     }
     return lotto;
 }
+
+function get_item() {
+    
+    firstBB = new THREE.Box3().setFromObject(penguin);
+
+    for (index = 0; index < itemList.length; index++) {
+        secondBB = new THREE.Box3().setFromObject(itemList[index]);
+        var coll = firstBB.isIntersectionBox(secondBB);
+        if (coll) {
+            scene.remove(itemList[index])
+            itemList.splice(index, 1);
+            return 1;
+
+        }
+
+    }
+    return 0;
+}
 function collision() {
     firstBB = new THREE.Box3().setFromObject(penguin);
 
@@ -89,12 +105,6 @@ function collision() {
     return 0;
 }
 
-//mesh remove
-function remove(id) {
-    scene.remove(scene.getObjectByName(id));
-}
-
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! function random 부분
 function random(random_v, i, j) {
     if (random_v == 0) {
         seal.push(drawSeal(400 * j, -600 - i * 450, -600));
@@ -105,9 +115,10 @@ function random(random_v, i, j) {
         seal[seal_count].position.z += 500;
         seal[seal_count].position.x -= 500;
         //seal[seal_count].position.y-=random_distance*400;
-
         scene.add(seal[seal_count]);
+        collidableMeshList.push(seal[seal_count]);
         seal_count++;
+        
 
     }
 
@@ -118,6 +129,7 @@ function random(random_v, i, j) {
         bear[bear_count].position.x -= 500;
         //bear[bear_count].position.y-=random_distance*400;
         scene.add(bear[bear_count]);
+        collidableMeshList.push(bear[bear_count]);
         bear_count++;
 
 
@@ -132,6 +144,7 @@ function random(random_v, i, j) {
         //shark[shark_count].position.y+=600+i*450;
 
         scene.add(shark[shark_count]);
+        collidableMeshList.push(shark[shark_count]);
         shark_count++;
 
 
@@ -246,7 +259,7 @@ function meshAdd() {
     //items
     item = drawItem(0, 0, 40);
     scene.add(item);
-    collidableMeshList.push(item)
+    itemList.push(item)
 
 }
 
@@ -278,8 +291,8 @@ function setWater() {
 
 function init() {
     //size
-    var width = window.innerWidth;
-    var height = window.innerHeight;
+    var width = 600;
+    var height = 600;
 
     //render
     container = document.getElementById('container');
@@ -288,6 +301,7 @@ function init() {
     renderer.setSize(width, height);
     renderer.setClearColor(0x9999BB, 1);
     container.appendChild(renderer.domElement);
+   
 
 
     //mesh add
@@ -301,14 +315,16 @@ function init() {
     camera.lookAt(0, 0, 0);
     scene.add(camera);
 
+
     //--배경
     var materialArray = [];
-    var texture_ft = new THREE.TextureLoader().load('img/fadeaway_ft.jpg');
-    var texture_bk = new THREE.TextureLoader().load('img/fadeaway_bk.jpg');
-    var texture_up = new THREE.TextureLoader().load('img/fadeaway_up.jpg');
-    var texture_dn = new THREE.TextureLoader().load('img/fadeaway_dn.jpg');
-    var texture_rt = new THREE.TextureLoader().load('img/fadeaway_rt.jpg');
-    var texture_lf = new THREE.TextureLoader().load('img/fadeaway_lf.jpg');
+    var texture_ft = new THREE.TextureLoader().load('img/yonder_ft.jpg');
+    var texture_bk = new THREE.TextureLoader().load('img/yonder_bk.jpg');
+    var texture_up = new THREE.TextureLoader().load('img/yonder_up.jpg');
+    var texture_dn = new THREE.TextureLoader().load('img/yonder_dn.jpg');
+    var texture_rt = new THREE.TextureLoader().load('img/yonder_rt.jpg');
+    var texture_lf = new THREE.TextureLoader().load('img/yonder_lf.jpg');
+
 
     materialArray.push(new THREE.MeshBasicMaterial({ map: texture_ft, side: THREE.BackSide }));
     materialArray.push(new THREE.MeshBasicMaterial({ map: texture_bk, side: THREE.BackSide }));
@@ -321,6 +337,7 @@ function init() {
     //background
     var skyboxGeometry = new THREE.BoxGeometry(maxX + 1, maxY + 1, maxZ);
     var skybox = new THREE.Mesh(skyboxGeometry, materialArray);
+   skybox.rotation.x = 1 * Math.PI / 2;
     skybox.position.set(maxX/2, 50, 0);
     scene.add(skybox);
 
@@ -347,8 +364,19 @@ function init() {
     scene.add(waterObj);
 
 
-
-
+   var listener = new THREE.AudioListener();
+   camera.add( listener );
+   var sound = new THREE.Audio( listener );
+   function playSound() {
+      var audioLoader = new THREE.AudioLoader();
+      audioLoader.load("sounds/ppyong.org", function(buffer) {
+      sound.setBuffer( buffer );
+      sound.setVolume(0.5);
+      sound.setLoop(false);
+      sound.play();
+   });
+   }
+   
 
 
 
@@ -393,22 +421,28 @@ function init() {
 
         //펭귄 움직이기
         moveForward();
+        if(penguin.position.x>=maxX)
+        {
+            stage++;
+        }
         checkSuper();
 
         //movePengForward(penguin);
         //contraryPenguin(penguin);
-		updateScoreBoard();
+      updateScoreBoard();
         
-		renderer.render(scene, camera);
+      renderer.render(scene, camera);
 
         //충돌하면 return 1 그리고 list에서 해당 object 제외.
-        //item effect
+
         
-        //충돌하면 return 1 그리고 list에서 해당 object 제외.
+        if(superPenguinState==0){
+            if(collision()==1){
+                alert("GAME OVER!");
+            }
+        }
         //item effect
-        if (collision() == 1) {
-            t1 = performance.now() / 1000;
-            console.log('t1', t1);
+        if (get_item() == 1) {
 
             //var itemRandNum = Math.floor(Math.random()*10);
             var itemRandNum = 0
@@ -422,45 +456,31 @@ function init() {
             }
         }
 
+
     }
 
     document.addEventListener("keydown", onDocumentKeyDown, false);
     function onDocumentKeyDown(event) {
         var keyCode = event.which;
-        if (keyCode == 37)   //right
+         if (keyCode == 37)   //left
         {
-            if (superPenguinState == 0) {
-                if (penguin.position.y < 1000) {
-                    penguin.position.y += 100;
-                }
-            }
-            else {
-                if (penguin.position.y < 900) {
-                    penguin.position.y += 100;
-                }
-
-            }
-
+         playSound();
+            lockPeng = 3;
         }
-        if (keyCode == 39)   //left
+        else if (keyCode == 39)   //right
         {
-            if (superPenguinState == 0) {
-                if (penguin.position.y > -1050) {
-                    penguin.position.y -= 100;
-                }
-            }
-            else {
-                if (penguin.position.y > -950) {
-                    penguin.position.y -= 100;
-                }
-
-            }
+         playSound();
+            lockPeng = 2;
         }
+
         if (keyCode == 38)   //front
         {
+         playSound();
             lockPeng = 1;//움직이는 상태로 변환
+            addPoint();
         }
     }
+
     function checkSuper() {
         if (superPenguinState == 1) {
             pengSpeed = 20;
@@ -468,12 +488,16 @@ function init() {
             console.log('t0', t0);
         }
         if (t0 - t1 >= 10) {
-            penguin.scale.set(0.8, 0.8, 0.8);
+            superPenguinState=0;
+            penguin.scale.set(0.85, 0.85, 0.85);
             pengSpeed = 10;
         }
     }
+
     function moveForward() {
         if (lockPeng == 1) {//움직이는 상태 = 키보드 입력 받으면 안됨 = 움직이는 동작 수행
+
+            penguin.rotation.z = 0;
             if (startPoint == -1)//이동 시작
             {
                 startPoint = penguin.position.x;//펭귄 이동이 시작한 곳
@@ -495,8 +519,60 @@ function init() {
             pengz /= 50;
             penguin.position.z = pengz;
         }
+        else if (lockPeng == 3) { //왼쪽
+            penguin.rotation.z = Math.PI / 2;
+            if (startPoint == -1)//이동 시작
+            {
+                startPoint = penguin.position.y;//펭귄 이동이 시작한 곳
+            }
 
-        
+            var pengy = penguin.position.y + pengSpeed;
+            var maxRightY = maxY / 2;
+            if (pengy >= maxRightY) {
+                return;
+            }
+            if (startPoint + 100 < pengy - 5) {
+                startPoint = -1;
+                lockPeng = -1;
+                return;
+            }
+
+            penguin.position.y = pengy;
+            if (pengy < 0)
+                pengy *= -1;
+            pengy %= 100;
+            var pengz = -1 * (pengy - 50) * (pengy - 50) + 2500;
+            pengz /= 50;
+            penguin.position.z = pengz;
+        }
+        else if (lockPeng == 2) { //오른쪽
+            penguin.rotation.z = - Math.PI / 2;
+            if (startPoint == -1)//이동 시작
+            {
+                startPoint = penguin.position.y;//펭귄 이동이 시작한 곳
+            }
+
+            var pengy = penguin.position.y - pengSpeed;
+            var maxRightY = (maxY / 2) * -1;
+            
+            if (pengy < maxRightY+100) {
+                return;
+            }
+            
+            if (startPoint - 100 > pengy + 5) {
+                startPoint = -1;
+                lockPeng = -1;
+                return;
+            }
+
+            penguin.position.y = pengy;
+            if(pengy < 0)
+                pengy *= -1;
+            pengy %= 100;
+            var pengz = -1 * (pengy - 50) * (pengy - 50) + 2500;
+            pengz /= 50;
+            penguin.position.z = pengz;
+        }
     }
 
 
