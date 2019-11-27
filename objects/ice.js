@@ -56,5 +56,4 @@ function generateTexture() {
    context.fill();
 
    return canvas;
-
 }
