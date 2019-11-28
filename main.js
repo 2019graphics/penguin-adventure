@@ -350,6 +350,7 @@ function init() {
 
     skybox.rotation.x = 1 * Math.PI / 2;
     skybox.position.set(maxX / 2, 50, 0);
+    scene.add(skybox);
 
 
 
@@ -372,7 +373,7 @@ function init() {
     //파도
     var waterObj = setWater();
     waterObj.position.set(maxX / 2, 50, -80);
-
+    scene.add(waterObj);
 
 
     var listener = new THREE.AudioListener();
