@@ -1,4 +1,4 @@
-var camera, scene, renderer,container,scoreBoard;
+var camera, scene, renderer, container, scoreBoard;
 var theta = 0;
 var random_v = [];
 var seal = [];
@@ -9,17 +9,18 @@ var bear_count = 0;
 var shark_count = 0;
 var penguin = [];
 
-var startPoint_bear=-5000;
+var startPoint_bear = -5000;
 var random_distance = 0;
 var back_bear;
 
 var superPenguinState = 0;
+var directItem = 0;
 var currentSuperPenguinTime;
 
 var t0 = 0;
 var t1 = 0;
 var pengSpeed = 10;
-var bearSpeed=2;
+var bearSpeed = 2;
 
 var lockPeng = -1;//움직여도 되는 상태
 var startPoint = -1;
@@ -29,12 +30,12 @@ var icebergs, snowballs, item;
 var snowCount = 50;
 
 var collidableMeshList = [];
-var itemList=[];
+var itemList = [];
 
-var score=0;
-var stage=1;
+var score = 0;
+var stage = 1;
 
-scoreBoard=document.getElementById('scoreBoard');
+scoreBoard = document.getElementById('scoreBoard');
 
 
 //size
@@ -42,11 +43,11 @@ var maxX = 4000, maxY = 4000, maxZ = 4000;
 
 init();
 
-function addPoint(){
-    score+=stage*80;
+function addPoint() {
+    score += stage * 80;
 }
 function updateScoreBoard() {
-    scoreBoard.innerHTML='Score: '+score+'(Stage: '+stage+')';
+    scoreBoard.innerHTML = 'Score: ' + score + '(Stage: ' + stage + ')';
     console.log(score);
 }
 
@@ -77,7 +78,7 @@ function randCom(total, object) {
 }
 
 function get_item() {
-    
+
     firstBB = new THREE.Box3().setFromObject(penguin);
 
     for (index = 0; index < itemList.length; index++) {
@@ -111,7 +112,7 @@ function collision() {
 
 function random(random_v, i, j) {
     if (random_v == 0) {
-        seal.push(drawSeal(400 * j, -600 - i * 450, -600));
+        seal.push(drawSeal(400 * j + 50, -600 - i * 450, -600));
         var position_seal = [seal[seal_count].position.x, seal[seal_count].position.y, seal[seal_count].position.z];
 
         seal[seal_count].rotation.z += 90 * Math.PI / 180;
@@ -122,12 +123,12 @@ function random(random_v, i, j) {
         scene.add(seal[seal_count]);
         collidableMeshList.push(seal[seal_count]);
         seal_count++;
-        
+
 
     }
 
     else if (random_v == 1) {
-        bear.push(drawBear(400 * j, -600 - i * 450, -600));
+        bear.push(drawBear(400 * j + 50, -600 - i * 450, -600));
         bear[bear_count].rotation.z += 90 * Math.PI / 180;
         bear[bear_count].position.z += 500;
         bear[bear_count].position.x -= 500;
@@ -139,7 +140,7 @@ function random(random_v, i, j) {
 
     }
     else if (random_v == 2) {
-        shark.push(drawShark(400 * j, -600 - i * 450, -600));
+        shark.push(drawShark(400 * j + 50, -600 - i * 450, -600));
         shark[shark_count].rotation.z += 90 * Math.PI / 180;
         shark[shark_count].position.z += 500;
         shark[shark_count].position.x -= 500;
@@ -225,14 +226,14 @@ function meshAdd() {
 
     /*snowball*/
     //ver 1. create a snowball
-    
+
     snowballs = [];
-    for (var i = 0; i < snowCount ; i++) {
-        var snowball = drawSnowBall(Math.random() * maxX, Math.random() * maxY-1950, (maxZ/2) * Math.random() );//눈송이 범위
+    for (var i = 0; i < snowCount; i++) {
+        var snowball = drawSnowBall(Math.random() * maxX, Math.random() * maxY - 1950, (maxZ / 2) * Math.random());//눈송이 범위
         snowballs.push(snowball);
         scene.add(snowball);
     }
-    
+
 
     penguin = drawPeng(0, 0, -40);
     penguin.scale.set(0.8, 0.8, 0.8);
@@ -241,9 +242,8 @@ function meshAdd() {
     back_bear = drawBear(-300, 0, 100);
     back_bear.scale.set(2, 2, 2);
     scene.add(back_bear);
-    collidableMeshList.push(back_bear);
 
-    
+
 
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
     random_distance = Math.random() * 500 + 300;
@@ -311,7 +311,7 @@ function init() {
     renderer.setSize(width, height);
     renderer.setClearColor(0x9999BB, 1);
     container.appendChild(renderer.domElement);
-   
+
 
 
     //mesh add
@@ -347,9 +347,10 @@ function init() {
     //background
     var skyboxGeometry = new THREE.BoxGeometry(maxX + 1, maxY + 1, maxZ);
     var skybox = new THREE.Mesh(skyboxGeometry, materialArray);
-   skybox.rotation.x = 1 * Math.PI / 2;
-    skybox.position.set(maxX/2-50, 50, 0);
-    scene.add(skybox);
+
+    skybox.rotation.x = 1 * Math.PI / 2;
+    skybox.position.set(maxX / 2, 50, 0);
+
 
 
 
@@ -370,23 +371,23 @@ function init() {
 
     //파도
     var waterObj = setWater();
-    waterObj.position.set(maxX/2-50, 50, -80);
-    scene.add(waterObj);
+    waterObj.position.set(maxX / 2, 50, -80);
 
 
-   var listener = new THREE.AudioListener();
-   camera.add( listener );
-   var sound = new THREE.Audio( listener );
-   function playSound() {
-      var audioLoader = new THREE.AudioLoader();
-      audioLoader.load("sounds/ppyong.org", function(buffer) {
-      sound.setBuffer( buffer );
-      sound.setVolume(0.5);
-      sound.setLoop(false);
-      sound.play();
-   });
-   }
-   
+
+    var listener = new THREE.AudioListener();
+    camera.add(listener);
+    var sound = new THREE.Audio(listener);
+    function playSound() {
+        var audioLoader = new THREE.AudioLoader();
+        audioLoader.load("sounds/ppyong.org", function (buffer) {
+            sound.setBuffer(buffer);
+            sound.setVolume(0.5);
+            sound.setLoop(false);
+            sound.play();
+        });
+    }
+
 
 
 
@@ -407,92 +408,92 @@ function init() {
         }
 
         //snowball
-        
-        for (i = 0; i < snowCount ; i++) {
+
+        for (i = 0; i < snowCount; i++) {
             snowballs[i].position.z -= 3;
-            if (snowballs[i].position.z <= -100) {  
-                 snowballs[i].position.z = maxZ/2-500;     
-                }
+            if (snowballs[i].position.z <= -100) {
+                snowballs[i].position.z = maxZ / 2 - 500;
+            }
         }
-        
+
 
         //장애물 움직이기
-       for(var i=0;i<26;i++)
-       {
-           randommove(random_v[i]);
-       } 
+        for (var i = 0; i < 26; i++) {
+            randommove(random_v[i]);
+        }
 
         camera.position.set(penguin.position.x - 1000, penguin.position.y - 200, 1000);
         //camera.position.y = Math.cos(theta)*2000;
         //camera.position.x = Math.sin(theta)*2000;
-        camera.lookAt(penguin.position.x+300, penguin.position.y, 0);
+        camera.lookAt(penguin.position.x + 300, penguin.position.y, 0);
 
+        //따라오는 곰 위치
+        if(back_bear.position.x-100>penguin.position.x){
+            alert("Catch!");
+        }
         //펭귄 움직이기
         moveForward();
-        if(penguin.position.x>=maxX)
-        {
+        if (penguin.position.x >= maxX) {
             stage++;
         }
         checkSuper();
+        checkDirect();
 
         if (startPoint_bear == -5000)//이동 시작
         {
             startPoint_bear = back_bear.position.x; //펭귄 이동이 시작한 곳
         }
-/*
-        var pengx = penguin.position.x + pengSpeed;
-        if (pengx >= maxX) {
-            penguin.position.x %= maxX;
-        }
-        if (startPoint + 100 < pengx-5) {
-            startPoint = -1;
-            lockPeng = -1;
-            return;
-        }
-
-        penguin.position.x = pengx;
-        pengx %= 100;
-        var pengz = -1 * (pengx - 50) * (pengx - 50) + 2500;
-        pengz /= 50;
-        penguin.position.z = pengz;
-
-        */
-
-        var bearx=back_bear.position.x+bearSpeed;
-     
-
-     if (penguin.position.x==0){
-           //back_bear.position.x %= maxX;
-          
-           back_bear.position.x%=maxX;
-           back_bear.position.x=0;
-
-    //var bearx = (theta * 200) % maxX;
-            //back_bear.position.x = bearx;
-    }
-   
-   else{
-    back_bear.position.x = bearx;
-
-    bearx %= 100;
-    var bearz = -1 * (bearx - 50) * (bearx - 50);
-    bearz /= 50;
-    back_bear.position.z = bearz;
-
-   }
-
-
-        //movePengForward(penguin);
-        //contraryPenguin(penguin);
-      updateScoreBoard();
+        /*
+                var pengx = penguin.position.x + pengSpeed;
+                if (pengx >= maxX) {
+                    penguin.position.x %= maxX;
+                }
+                if (startPoint + 100 < pengx-5) {
+                    startPoint = -1;
+                    lockPeng = -1;
+                    return;
+                }
         
-      renderer.render(scene, camera);
+                penguin.position.x = pengx;
+                pengx %= 100;
+                var pengz = -1 * (pengx - 50) * (pengx - 50) + 2500;
+                pengz /= 50;
+                penguin.position.z = pengz;
+        
+                */
+
+        var bearx = back_bear.position.x + bearSpeed;
+
+
+        if (penguin.position.x == 0) {
+            //back_bear.position.x %= maxX;
+
+            back_bear.position.x %= maxX;
+            back_bear.position.x = 0;
+
+            //var bearx = (theta * 200) % maxX;
+            //back_bear.position.x = bearx;
+        }
+
+        else {
+            back_bear.position.x = bearx;
+
+            bearx %= 100;
+            var bearz = -1 * (bearx - 50) * (bearx - 50);
+            bearz /= 50;
+            back_bear.position.z = bearz;
+
+        }
+
+        updateScoreBoard();
+
+        renderer.render(scene, camera);
 
         //충돌하면 return 1 그리고 list에서 해당 object 제외.
 
-        
-        if(superPenguinState==0){
-            if(collision()==1){
+
+        if (superPenguinState == 0) {
+            if (collision() == 1) {
                 alert("GAME OVER!");
             }
         }
@@ -500,14 +501,14 @@ function init() {
         if (get_item() == 1) {
 
             //var itemRandNum = Math.floor(Math.random()*10);
-            var itemRandNum = 0
+            var itemRandNum = 1;
             if (itemRandNum == 0) {
                 superPenguinState = 1;
-                scene.remove(item)
                 superPenguin(penguin);
             }
             else if (itemRandNum == 1) {
-                contraryPenguin(penguin);
+                directItem = 1;
+                
             }
         }
 
@@ -517,21 +518,38 @@ function init() {
     document.addEventListener("keydown", onDocumentKeyDown, false);
     function onDocumentKeyDown(event) {
         var keyCode = event.which;
-         if (keyCode == 37)   //left
+        if (keyCode == 37)   //left
         {
-         playSound();
-            lockPeng = 3;
+            playSound();
+            if (directItem == 0) {
+                lockPeng = 3;
+            }
+            else if (directItem == 1) {
+                lockPeng = 2;
+            }
+
         }
         else if (keyCode == 39)   //right
         {
-         playSound();
-            lockPeng = 2;
+            playSound();
+            if (directItem == 0) {
+                lockPeng = 2;
+            }
+            else if (directItem == 1) {
+                lockPeng = 3;
+            }
         }
 
         if (keyCode == 38)   //front
         {
-         playSound();
-            lockPeng = 1;//움직이는 상태로 변환
+            playSound();
+            if(directItem==0){
+                lockPeng = 1;//움직이는 상태로 변환
+            }
+            else if(directItem==1){
+                lockPeng=0;
+            }
+        
             addPoint();
         }
     }
@@ -543,9 +561,18 @@ function init() {
             console.log('t0', t0);
         }
         if (t0 - t1 >= 10) {
-            superPenguinState=0;
-            penguin.scale.set(0.85, 0.85, 0.85);
+            superPenguinState = 0;
+            penguin.scale.set(0.8, 0.8, 0.8);
             pengSpeed = 10;
+        }
+    }
+
+    function checkDirect() {
+        if (directItem == 1) {
+            t0 = performance.now() /1000;
+        }
+        if (t0 - t1 >= 10) {
+            directItem = 0;
         }
     }
 
@@ -562,7 +589,7 @@ function init() {
             if (pengx >= maxX) {
                 penguin.position.x %= maxX;
             }
-            if (startPoint + 100 < pengx-5) {
+            if (startPoint + 100 < pengx - 5) {
                 startPoint = -1;
                 lockPeng = -1;
                 return;
@@ -609,11 +636,11 @@ function init() {
 
             var pengy = penguin.position.y - pengSpeed;
             var maxRightY = (maxY / 2) * -1;
-            
-            if (pengy < maxRightY+100) {
+
+            if (pengy < maxRightY + 100) {
                 return;
             }
-            
+
             if (startPoint - 100 > pengy + 5) {
                 startPoint = -1;
                 lockPeng = -1;
@@ -621,12 +648,37 @@ function init() {
             }
 
             penguin.position.y = pengy;
-            if(pengy < 0)
+            if (pengy < 0)
                 pengy *= -1;
             pengy %= 100;
             var pengz = -1 * (pengy - 50) * (pengy - 50) + 2500;
             pengz /= 50;
             penguin.position.z = pengz;
+        }
+        else if(lockPeng==0){
+
+            penguin.rotation.z = Math.PI;
+            if (startPoint == -1)//이동 시작
+            {
+                startPoint = penguin.position.x;//펭귄 이동이 시작한 곳
+            }
+
+            var pengx = penguin.position.x + pengSpeed;
+            if (pengx >= maxX) {
+                penguin.position.x %= maxX;
+            }
+            if (startPoint + 100 < pengx - 5) {
+                startPoint = -1;
+                lockPeng = -1;
+                return;
+            }
+
+            penguin.position.x = pengx;
+            pengx %= 100;
+            var pengz = -1 * (pengx - 50) * (pengx - 50) + 2500;
+            pengz /= 50;
+            penguin.position.z = pengz;
+
         }
     }
 
@@ -634,79 +686,8 @@ function init() {
     //랜더링 시작
     animate();
 
-    function movePengForward(penguin) {
-        var xSpeed = 1;
-        var ySpeed = 1;
-        if (superPenguinState == 1) {
-            xSpeed = 3;
-            currentSuperPenguinTime = theta;
-        }
-        document.addEventListener("keydown", onDocumentKeyDown, false);
-        function onDocumentKeyDown(event) {
-            var keyCode = event.which;
-            if (keyCode == 37)   //right
-            {
-                penguin.position.y += ySpeed / theta;;
-                //alert(penguin.position.y);
-            }
-            if (keyCode == 39)   //left
-            {
-                penguin.position.y -= ySpeed / theta;;
-                //alert(penguin.position.y);
-            }
-            if (keyCode == 38)   //front
-            {
-                           
-                penguin.position.x += xSpeed / theta;
-                if (penguin.position.x > maxX) {
-                    penguin.position.x %= maxX;
-                }
-                
-            }
-        }
-
-        if (theta - currentSuperPenguinTime >= 0.01) {
-            penguin.scale.set(0.8, 0.8, 0.8);
-        }
-
-    }
     function superPenguin(penguin) {
         penguin.scale.set(2.0, 2.0, 2.0);
     }
-    function contraryPenguin(penguin, theta) {
-        var xSpeed = 1;
-        var ySpeed = 1;
 
-        document.addEventListener("keydown", onDocumentKeyDown, false);
-        function onDocumentKeyDown(event) {
-            var keyCode = event.which;
-            if (keyCode == 39)   //right
-            {
-                penguin.position.y += ySpeed / theta;
-            }
-            if (keyCode == 37)   //left
-            {
-                penguin.position.y -= ySpeed / theta;
-            }
-            if (keyCode == 38)   //front
-            {
-                penguin.position.x += xSpeed / theta;
-                if (penguin.position.x > maxX) {
-                    penguin.position.x %= maxX;
-                }
-                //TODO:뛰는건 아직...
-                /*
-                //penguin move
-                var pengx = (theta * 200) % maxX;
-                penguin.position.x = pengx;
-                pengx %= 100;
-                var pengz = -1 * (pengx - 50) * (pengx - 50) + 2500;
-                pengz /= 50;
-                penguin.position.z = pengz;
-                */
-
-                
-            }
-        }
-    }
 }
