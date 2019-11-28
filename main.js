@@ -218,7 +218,7 @@ function meshAdd() {
     icebergs = [];
     iceLoc = randCom(40, 30);
     for (var i = 0; i < 20; i++) {
-        var ice = drawIce(iceLoc[i] * 100 - 50, 0, 0);
+        var ice = drawIce(iceLoc[i] * 100, 0, 0);
         icebergs.push(ice);
         scene.add(ice);
     }
@@ -348,7 +348,7 @@ function init() {
     var skyboxGeometry = new THREE.BoxGeometry(maxX + 1, maxY + 1, maxZ);
     var skybox = new THREE.Mesh(skyboxGeometry, materialArray);
    skybox.rotation.x = 1 * Math.PI / 2;
-    skybox.position.set(maxX/2, 50, 0);
+    skybox.position.set(maxX/2-50, 50, 0);
     scene.add(skybox);
 
 
@@ -370,7 +370,7 @@ function init() {
 
     //파도
     var waterObj = setWater();
-    waterObj.position.set(maxX/2, 50, -80);
+    waterObj.position.set(maxX/2-50, 50, -80);
     scene.add(waterObj);
 
 
@@ -423,7 +423,6 @@ function init() {
        } 
 
         camera.position.set(penguin.position.x - 1000, penguin.position.y - 200, 1000);
-        //camera.position.set(-5000, 300, 2000);
         //camera.position.y = Math.cos(theta)*2000;
         //camera.position.x = Math.sin(theta)*2000;
         camera.lookAt(penguin.position.x+300, penguin.position.y, 0);
