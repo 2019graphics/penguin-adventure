@@ -8,7 +8,10 @@ var seal_count = 0;
 var bear_count = 0;
 var shark_count = 0;
 var penguin = [];
+
+var startPoint_bear=-5000;
 var random_distance = 0;
+var back_bear;
 
 var superPenguinState = 0;
 var currentSuperPenguinTime;
@@ -16,13 +19,14 @@ var currentSuperPenguinTime;
 var t0 = 0;
 var t1 = 0;
 var pengSpeed = 10;
+var bearSpeed=2;
 
 var lockPeng = -1;//움직여도 되는 상태
 var startPoint = -1;
 
 //meshs
 var icebergs, snowballs, item;
-var snowCount = 10;
+var snowCount = 50;
 
 var collidableMeshList = [];
 var itemList=[];
@@ -39,7 +43,7 @@ var maxX = 4000, maxY = 4000, maxZ = 4000;
 init();
 
 function addPoint(){
-    score+=stage*100;
+    score+=stage*80;
 }
 function updateScoreBoard() {
     scoreBoard.innerHTML='Score: '+score+'(Stage: '+stage+')';
@@ -221,18 +225,24 @@ function meshAdd() {
 
     /*snowball*/
     //ver 1. create a snowball
-    /*
+    
     snowballs = [];
     for (var i = 0; i < snowCount ; i++) {
-        var snowball = drawSnowBall(Math.random() * 500, Math.random() * 500, Math.random() * 500);
+        var snowball = drawSnowBall(Math.random() * maxX, Math.random() * maxY-1950, (maxZ/2) * Math.random() );//눈송이 범위
         snowballs.push(snowball);
         scene.add(snowball);
     }
-    */
+    
 
     penguin = drawPeng(0, 0, -40);
     penguin.scale.set(0.8, 0.8, 0.8);
     scene.add(penguin);
+
+    back_bear = drawBear(-300, 0, 100);
+    back_bear.scale.set(2, 2, 2);
+    scene.add(back_bear);
+    collidableMeshList.push(back_bear);
+
     
 
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
@@ -397,15 +407,14 @@ function init() {
         }
 
         //snowball
-        /*
+        
         for (i = 0; i < snowCount ; i++) {
-            //alert(snowballs[i].position.z);
             snowballs[i].position.z -= 3;
-            if (snowballs[i].position.z <= -200) {
-                snowballs[i].position.z = 11000;
-            }
+            if (snowballs[i].position.z <= -100) {  
+                 snowballs[i].position.z = maxZ/2-500;     
+                }
         }
-        */
+        
 
         //장애물 움직이기
        for(var i=0;i<26;i++)
@@ -426,6 +435,53 @@ function init() {
             stage++;
         }
         checkSuper();
+
+        if (startPoint_bear == -5000)//이동 시작
+        {
+            startPoint_bear = back_bear.position.x; //펭귄 이동이 시작한 곳
+        }
+/*
+        var pengx = penguin.position.x + pengSpeed;
+        if (pengx >= maxX) {
+            penguin.position.x %= maxX;
+        }
+        if (startPoint + 100 < pengx-5) {
+            startPoint = -1;
+            lockPeng = -1;
+            return;
+        }
+
+        penguin.position.x = pengx;
+        pengx %= 100;
+        var pengz = -1 * (pengx - 50) * (pengx - 50) + 2500;
+        pengz /= 50;
+        penguin.position.z = pengz;
+
+        */
+
+        var bearx=back_bear.position.x+bearSpeed;
+     
+
+     if (penguin.position.x==0){
+           //back_bear.position.x %= maxX;
+          
+           back_bear.position.x%=maxX;
+           back_bear.position.x=0;
+
+    //var bearx = (theta * 200) % maxX;
+            //back_bear.position.x = bearx;
+    }
+   
+   else{
+    back_bear.position.x = bearx;
+
+    bearx %= 100;
+    var bearz = -1 * (bearx - 50) * (bearx - 50);
+    bearz /= 50;
+    back_bear.position.z = bearz;
+
+   }
+
 
         //movePengForward(penguin);
         //contraryPenguin(penguin);
@@ -601,17 +657,7 @@ function init() {
             }
             if (keyCode == 38)   //front
             {
-                //TODO:뛰는건 아직...
-                /*
-                //penguin move
-                var pengx = (theta * 200) % maxX;
-                penguin.position.x = pengx;
-                pengx %= 100;
-                var pengz = -1 * (pengx - 50) * (pengx - 50) + 2500;
-                pengz /= 50;
-                penguin.position.z = pengz;
-                */
-                
+                           
                 penguin.position.x += xSpeed / theta;
                 if (penguin.position.x > maxX) {
                     penguin.position.x %= maxX;
