@@ -2,8 +2,8 @@ function drawSeal(xOffset, yOffset, zOffset) {
     var group = new THREE.Group();
     zOffset += 75 / 2 + 35;
 
-    var headGeometry = new THREE.CubeGeometry(100, 100, 100);//geometry, Å¥ºê »ý¼º
-    var headMaterial = new THREE.MeshLambertMaterial({ color: 0xD0CECE });//material, 16Áø¼ö »ö
+    var headGeometry = new THREE.CubeGeometry(100, 100, 100);//geometry, Å¥ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    var headMaterial = new THREE.MeshLambertMaterial({ color: 0xD0CECE });//material, 16ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
     var head = new THREE.Mesh(headGeometry, headMaterial);//meshe
     head.position.set(10 + xOffset, 0 + yOffset, 50 + zOffset);
     group.add(head);
@@ -17,8 +17,8 @@ function drawSeal(xOffset, yOffset, zOffset) {
     group.add(eye1);
     group.add(eye2);
 
-    var noseGeometry = new THREE.CubeGeometry(5, 10, 10);//geometry, Å¥ºê »ý¼º
-    var noseMaterial = new THREE.MeshLambertMaterial({ color: 0x000000 });//material, 16Áø¼ö »ö
+    var noseGeometry = new THREE.CubeGeometry(5, 10, 10);//geometry, Å¥ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    var noseMaterial = new THREE.MeshLambertMaterial({ color: 0x000000 });//material, 16ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
     var nose = new THREE.Mesh(noseGeometry, noseMaterial);//meshe
     nose.position.set(78 + xOffset, 0 + yOffset, 36 + zOffset);
     group.add(nose);
@@ -35,20 +35,20 @@ function drawSeal(xOffset, yOffset, zOffset) {
     line.position.set(60 + xOffset, 0 + yOffset, 20 + zOffset);
     group.add(line);
 
-    var bodyGeometry = new THREE.CubeGeometry(140, 100, 75);//geometry, Å¥ºê »ý¼º
-    var bodyMaterial = new THREE.MeshLambertMaterial({ color: 0xD0CECE });//material, 16Áø¼ö »ö
+    var bodyGeometry = new THREE.CubeGeometry(140, 100, 75);//geometry, Å¥ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    var bodyMaterial = new THREE.MeshLambertMaterial({ color: 0xD0CECE });//material, 16ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
     var body = new THREE.Mesh(bodyGeometry, bodyMaterial);//meshe
     body.position.set(-40 + xOffset, 0 + yOffset, -35 + zOffset);
     group.add(body);
 
-    var tailGeometry = new THREE.CubeGeometry(50, 80, 30);//geometry, Å¥ºê »ý¼º
-    var tailMaterial = new THREE.MeshLambertMaterial({ color: 0xD0CECE });//material, 16Áø¼ö »ö
+    var tailGeometry = new THREE.CubeGeometry(50, 80, 30);//geometry, Å¥ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    var tailMaterial = new THREE.MeshLambertMaterial({ color: 0xD0CECE });//material, 16ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
     var tail = new THREE.Mesh(tailGeometry, tailMaterial);//meshe
     tail.position.set(-130 + xOffset, 0 + yOffset, -57 + zOffset);
     group.add(tail);
 
-    var handGeometry = new THREE.CubeGeometry(60, 150, 25);//geometry, Å¥ºê »ý¼º
-    var handMaterial = new THREE.MeshLambertMaterial({ color: 0xD0CECE });//material, 16Áø¼ö »ö
+    var handGeometry = new THREE.CubeGeometry(60, 150, 25);//geometry, Å¥ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    var handMaterial = new THREE.MeshLambertMaterial({ color: 0xD0CECE });//material, 16ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
     var hand = new THREE.Mesh(handGeometry, handMaterial);//meshe
     hand.position.set(-30 + xOffset, 0 + yOffset, -60 + zOffset);
     group.add(hand);
