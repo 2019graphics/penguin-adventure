@@ -47,7 +47,7 @@ function drawSeal(xOffset, yOffset, zOffset) {
     tail.position.set(-130 + xOffset, 0 + yOffset, -57 + zOffset);
     group.add(tail);
 
-    var handGeometry = new THREE.CubeGeometry(60, 180, 25);//geometry, 큐브 생성
+    var handGeometry = new THREE.CubeGeometry(60, 150, 25);//geometry, 큐브 생성
     var handMaterial = new THREE.MeshLambertMaterial({ color: 0xD0CECE });//material, 16진수 색
     var hand = new THREE.Mesh(handGeometry, handMaterial);//meshe
     hand.position.set(-30 + xOffset, 0 + yOffset, -60 + zOffset);
