@@ -76,7 +76,7 @@ function drawShark(xOffset, yOffset, zOffset) {
 	group.add(mesh);
    
     //오른쪽 지느러미 
-	Geometry = new THREE.CubeGeometry(45, 45, 30);
+	Geometry = new THREE.CubeGeometry(45, 30, 30);
 	Material = new THREE.MeshLambertMaterial({ color: 0x003399 });
 	mesh = new THREE.Mesh(Geometry, Material);
 	mesh.position.set(15 + xOffset, 60 + yOffset, 0 + zOffset);
