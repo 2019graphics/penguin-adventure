@@ -9,7 +9,7 @@ var bear_count = 0;
 var shark_count = 0;
 var penguin = [];
 
-var startPoint_bear = -5000;
+var startPoint_bear = -5000; // initial position of bear
 var random_distance = 0;
 var back_bear;
 
@@ -19,7 +19,7 @@ var currentSuperPenguinTime;
 
 var t0 = 0;
 var t1 = 0;
-var pengSpeed = 10;
+var pengSpeed = 10; 
 var bearSpeed = 2;
 
 var lockPeng = -1;//움직여도 되는 상태
@@ -29,30 +29,33 @@ var startPoint = -1;
 var icebergs, snowballs, item;
 var snowCount = 50;
 
-var collidableMeshList = [];
-var itemList = [];
+var collidableMeshList = []; //list of obtacles
+var itemList = []; //list of items
 
-var score = 0;
-var stage = 1;
+var score = 0; //initial score
+var stage = 1; //initial stage
 
-scoreBoard = document.getElementById('scoreBoard');
+var iceCount=15;
+
+scoreBoard = document.getElementById('scoreBoard'); //connect scoreboard
 
 
 //size
-var maxX = 4000, maxY = 4000, maxZ = 4000;
+var maxX = 3000, maxY = 3000, maxZ = 3000;
+var pathWidth=maxY/100;
 
 init();
 
+//add score function
 function addPoint() {
     score += stage * 80;
 }
+//update state of scoreboard
 function updateScoreBoard() {
     scoreBoard.innerHTML = 'Score: ' + score + '(Stage: ' + stage + ')';
     console.log(score);
 }
-
-
-//조합
+//ice position random select
 function randCom(total, object) {
     //total개 중에 object개 뽑기
 
@@ -76,16 +79,19 @@ function randCom(total, object) {
     }
     return lotto;
 }
-
+//check collision with item then return 1 when there is a collsion
 function get_item() {
-
+    //make box with penguin object
     firstBB = new THREE.Box3().setFromObject(penguin);
 
     for (index = 0; index < itemList.length; index++) {
+        //make box with item
         secondBB = new THREE.Box3().setFromObject(itemList[index]);
         var coll = firstBB.isIntersectionBox(secondBB);
         if (coll) {
+            //Deletes a colliding object from a scene
             scene.remove(itemList[index])
+            //Deletes a colliding object from a list
             itemList.splice(index, 1);
             return 1;
 
@@ -94,13 +100,18 @@ function get_item() {
     }
     return 0;
 }
+//check collision with obtacles then return 1 when there is a collsion
 function collision() {
+    //make box with penguin object
     firstBB = new THREE.Box3().setFromObject(penguin);
 
     for (index = 0; index < collidableMeshList.length; index++) {
+        //make box with obtacle object
         secondBB = new THREE.Box3().setFromObject(collidableMeshList[index]);
+        //check intersection between two boxes
         var coll = firstBB.isIntersectionBox(secondBB);
         if (coll) {
+            //Deletes a colliding object from a list
             collidableMeshList.splice(index, 1);
             return 1;
 
@@ -110,6 +121,7 @@ function collision() {
     return 0;
 }
 
+//은영씨 부분
 function random(random_v, i, j) {
     if (random_v == 0) {
         seal.push(drawSeal(400 * j + 50, -600 - i * 450, -600));
@@ -165,17 +177,6 @@ function randommove(randomObject) {
 
             var speed;
             var line = seal[l].position.y;
-            /*
-            if(line>maxY)
-            {seal[l].position.y%=maxY;
-    
-            }
-            if(line < 200) speed = 3;
-            else if(line >=200 && line <600) speed = 5;
-            else if(line >=600 && line <1500) speed = 2;
-    
-            else speed = 7;
-    */
             seal[l].position.y = sealy - 2000;
         }
 
@@ -217,9 +218,11 @@ function randommove(randomObject) {
 function meshAdd() {
     /*iceberg*/
     icebergs = [];
-    iceLoc = randCom(40, 30);
-    for (var i = 0; i < 20; i++) {
-        var ice = drawIce(iceLoc[i] * 100, 0, 0);
+    //store position index of icebergs
+    iceLoc = randCom(pathWidth, iceCount);
+
+    for (var i = 0; i < iceCount; i++) {
+        var ice = drawIce(iceLoc[i] * 100, 0, 0,pathWidth);
         icebergs.push(ice);
         scene.add(ice);
     }
@@ -273,10 +276,9 @@ function meshAdd() {
 
 }
 
-//water 생성
+//create water function
 function setWater() {
     /* Water */
-    //처음 2개까지로만 크기 조절.
     var waterGeo = new THREE.PlaneGeometry(maxX, maxY, 50, 50);
     var waterMat = new THREE.MeshPhongMaterial({
         color: 0x3366CC,
@@ -287,7 +289,7 @@ function setWater() {
         specular: 30,
         transparent: true
     });
-
+    //describe the wave
     for (var j = 0; j < waterGeo.vertices.length; j++) {
         waterGeo.vertices[j].x = waterGeo.vertices[j].x + ((Math.random() * Math.random()) * 30);
         waterGeo.vertices[j].y = waterGeo.vertices[j].y + ((Math.random() * Math.random()) * 20);
@@ -349,7 +351,7 @@ function init() {
     var skybox = new THREE.Mesh(skyboxGeometry, materialArray);
 
     skybox.rotation.x = 1 * Math.PI / 2;
-    skybox.position.set(maxX / 2, 50, 0);
+    skybox.position.set(maxX / 2-50, 50, 0);
     scene.add(skybox);
 
 
@@ -372,7 +374,7 @@ function init() {
 
     //파도
     var waterObj = setWater();
-    waterObj.position.set(maxX / 2, 50, -80);
+    waterObj.position.set(maxX / 2-50, 50, -80);
     scene.add(waterObj);
 
 
@@ -424,8 +426,6 @@ function init() {
         }
 
         camera.position.set(penguin.position.x - 1000, penguin.position.y - 200, 1000);
-        //camera.position.y = Math.cos(theta)*2000;
-        //camera.position.x = Math.sin(theta)*2000;
         camera.lookAt(penguin.position.x + 300, penguin.position.y, 0);
 
         //따라오는 곰 위치
@@ -550,8 +550,6 @@ function init() {
             else if(directItem==1){
                 lockPeng=0;
             }
-        
-            addPoint();
         }
     }
 
@@ -593,6 +591,7 @@ function init() {
             if (startPoint + 100 < pengx - 5) {
                 startPoint = -1;
                 lockPeng = -1;
+                addPoint();
                 return;
             }
 
@@ -671,6 +670,7 @@ function init() {
             if (startPoint + 100 < pengx - 5) {
                 startPoint = -1;
                 lockPeng = -1;
+                addPoint();
                 return;
             }
 
