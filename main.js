@@ -19,11 +19,17 @@ var currentSuperPenguinTime;
 
 var t0 = 0;
 var t1 = 0;
-var pengSpeed = 10; 
+var pengSpeed = 10;
 var bearSpeed = 2;
 
 var lockPeng = -1;//움직여도 되는 상태
 var startPoint = -1;
+var waterLoc = [];
+var iceLoc;
+var seal_direct0 = [];
+var seal_direct1= [];
+var shark_direct0 = [];
+var shark_direct1 = [];
 
 //meshs
 var icebergs, snowballs, item;
@@ -35,14 +41,14 @@ var itemList = []; //list of items
 var score = 0; //initial score
 var stage = 1; //initial stage
 
-var iceCount=15;
+var iceCount = 15;
 
 scoreBoard = document.getElementById('scoreBoard'); //connect scoreboard
 
 
 //size
 var maxX = 3000, maxY = 3000, maxZ = 3000;
-var pathWidth=maxY/100;
+var pathWidth = maxY / 100;
 
 init();
 
@@ -53,20 +59,19 @@ function addPoint() {
 //update state of scoreboard
 function updateScoreBoard() {
     scoreBoard.innerHTML = 'Score: ' + score + '(Stage: ' + stage + ')';
-    console.log(score);
 }
 //ice position random select
 function randCom(total, object) {
     //total개 중에 object개 뽑기
-
     var lotto = new Array(object);
-    var count = 0;
+    lotto[0] = 0;
+    var count = 1;
     var overl = true;
 
     while (count < object) {
         var number = 0;
         number = parseInt(Math.random() * total) + 1;
-        for (var i = 0; i < count; i++) {
+        for (var i = 1; i < count; i++) {
             if (lotto[i] == number) {
                 overl = false;
             }
@@ -119,98 +124,114 @@ function collision() {
     }
     return 0;
 }
+//create items
+function itemRandom() {
+    for (i = 0; i < 3; i++) {
+        var randX = getRandomArbitrary(1, 28);   //시작 두번째칸부터 마지막에서 두번째칸까지: (0 ~ 2900)
+        var randY = getRandomArbitrary(-14, 13);   //시작 두번째칸부터 마지막에서 두번째칸까지 (-1500 ~ 1400)
 
-//은영씨 부분
-function random(random_v, i, j) {
-    if (random_v == 0) {
-		oneSeal = drawSeal(400 * j + 50, -600 - i * 450, -600);
-		oneSeal.scale.set(0.8, 0.8, 0.8);
-        seal.push(oneSeal);
-        var position_seal = [seal[seal_count].position.x, seal[seal_count].position.y, seal[seal_count].position.z];
+        console.log('x', randX, 'y', randY)
 
+        item = drawItem(randX * 100, randY * 100, 0);
+        scene.add(item);
+        itemList.push(item);
+    }
+
+    console.log('itemList', itemList)
+}
+function getRandomArbitrary(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
+function draw_seal(seal_location, direction, i) {
+    if (direction == 0) {
+        seal.push(drawSeal(i * 500, -200 * seal_location, 0));
+        //seal.push(drawSeal(10,0 ,0));
+        //seal.push(drawSeal(100 * iceLoc[seal_location] - 50, 0, 0));
+        //seal.push(drawSeal(100*iceLoc[seal_location] , -i * 450,0));
+        seal[seal_count].scale.set(0.5, 0.5, 0.5);
+        //seal.push(drawSeal(100*iceLoc[seal_location] , -i * 450,0));
+        //seal.push(drawSeal(i*450 ,100*iceLoc[seal_location],0));
+        //seal.push(drawSeal(100*iceLoc[0] , -i * 450, -600));
+        // var position_seal = [seal[seal_count].position.x, seal[seal_count].position.y, seal[seal_count].position.z];
         seal[seal_count].rotation.z += 90 * Math.PI / 180;
         //seal[seal_count].position.y+=-800;
-        seal[seal_count].position.z += 500;
-        seal[seal_count].position.x -= 500;
+        // seal[seal_count].position.z += 500;
+        //seal[seal_count].position.x -= 500;
         //seal[seal_count].position.y-=random_distance*400;
         scene.add(seal[seal_count]);
+        seal_direct0.push(seal_count);
         collidableMeshList.push(seal[seal_count]);
         seal_count++;
+
     }
-    else if (random_v == 1) {
-		oneBear = drawBear(400 * j + 50, -600 - i * 450, -600);
-		oneBear.scale.set(0.8, 0.8, 0.8);
-        bear.push(oneBear);
-        bear[bear_count].rotation.z += 90 * Math.PI / 180;
-        bear[bear_count].position.z += 500;
-        bear[bear_count].position.x -= 500;
-        //bear[bear_count].position.y-=random_distance*400;
-        scene.add(bear[bear_count]);
-        collidableMeshList.push(bear[bear_count]);
-        bear_count++;
+
+    else {         //seal.push(drawSeal(0,100*iceLoc[seal_location] ,0));
+        seal.push(drawSeal(i * 500, 200 * seal_location, 0));
+        //seal.push(drawSeal(100*iceLoc[seal_location] , -i * 450,0));
+        seal[seal_count].scale.set(0.5, 0.5, 0.5);
+        //seal.push(drawSeal(100*iceLoc[seal_location] , i * 450+3000, 0));
+        //seal.push(drawSeal(i*450 ,100*iceLoc[seal_location],0));
+        //var position_seal = [seal[seal_count].position.x, seal[seal_count].position.y, seal[seal_count].position.z];
+        seal[seal_count].rotation.z -= 90 * Math.PI / 180;
+        //seal[seal_count].position.y-=-800;
+        //seal[seal_count].position.z += 500;
+        // seal[seal_count].position.x -= 500;
+        //seal[seal_count].position.y-=random_distance*400;
+        scene.add(seal[seal_count]);
+        seal_direct1.push(seal_count);
+        collidableMeshList.push(seal[seal_count]);
+        seal_count++;
+
     }
-    else if (random_v == 2) {
-		oneShark = drawShark(400 * j + 50, -600 - i * 450, -600);
-		oneShark.scale.set(0.8, 0.8, 0.8);
-        shark.push(oneShark);
+
+}
+
+function draw_shark(shark_location, direction, i) {
+    if (direction == 0) {
+
+        shark.push(drawShark(i * 500, -200 * shark_location, 0));
+        shark[shark_count].scale.set(0.5, 0.5, 0.5);
         shark[shark_count].rotation.z += 90 * Math.PI / 180;
-        shark[shark_count].position.z += 500;
-        shark[shark_count].position.x -= 500;
-
-
-        //shark[shark_count].position.y+=600+i*450;
-
         scene.add(shark[shark_count]);
+        shark_direct0.push(shark_count);
+        collidableMeshList.push(shark[shark_count]);
+        shark_count++;
+    }
+
+    else {
+
+        shark.push(drawShark(i * 500, 200 * shark_location, 0));
+        shark[shark_count].scale.set(0.5, 0.5, 0.5);
+        shark[shark_count].rotation.z -= 90 * Math.PI / 180;
+        scene.add(shark[shark_count]);
+        shark_direct1.push(shark_count);
         collidableMeshList.push(shark[shark_count]);
         shark_count++;
 
-
     }
 }
 
-//!!!!!!!!!!!!!!!!!!!!!!!!!! function randommove 부분
-function randommove(randomObject) {
-
-    if (randomObject == 0) {
-        var sealy = (theta * 200) % maxY + 100;
-        for (var l = 0; l < seal_count; l++) {
-
-            var speed;
-            var line = seal[l].position.y;
-            seal[l].position.y = sealy - 2000;
-        }
-
+function seal_move() {
+    var sealy = (theta * 200) % maxY + 100;
+    for(var l=0;l<seal_direct0.length;l++){
+        seal[seal_direct0[l]].position.y=sealy-2000;
     }
-    else if (randomObject == 1) {
-
-        var beary = (theta * 200) % maxY + 100;
-        for (var l = 0; l < bear_count; l++) {
-            bear[l].position.y = beary - 2100;
-            var speed;
-            var line = bear[l].position.x;
-            if (line < 200) speed = 3;
-            else if (line >= 200 && line < 600) speed = 5;
-            else speed = 7;
-
-        }
-
+    for(var l=0;l<seal_direct1.length;l++){
+        seal[seal_direct1[l]].position.y=-sealy + 2000;
     }
-    else if (randomObject == 2) {
 
-        var sharky = (theta * 200) % maxY + 100;
-        for (var l = 0; l < shark_count; l++) {
-            shark[l].position.y = sharky - 3000
-            var speed;
-            var line = shark[l].position.x;
-            if (line < 200) speed = 3;
-            else if (line >= 200 && line < 600) speed = 5;
-            else speed = 7;
-
-
-        }
-    }
 }
 
+function shark_move() {
+    var sharky = (theta * 200) % maxY + 100;
+    for(var l=0;l<shark_direct0.length;l++){
+        shark[shark_direct0[l]].position.y=sharky - 3000;
+    }
+    for(var l=0;l<shark_direct1.length;l++){
+        shark[shark_direct1[l]].position.y=-sharky + 3000;
+    }
+}
 
 //mesh 장면에 추가
 function meshAdd() {
@@ -220,10 +241,17 @@ function meshAdd() {
     iceLoc = randCom(pathWidth, iceCount);
 
     for (var i = 0; i < iceCount; i++) {
-        var ice = drawIce(iceLoc[i] * 100, 0, 0,pathWidth);
+        var ice = drawIce(iceLoc[i] * 100, 0, 0, pathWidth);
         icebergs.push(ice);
         scene.add(ice);
     }
+
+    iceLoc = iceLoc.sort(function (a, b) {
+
+        return a - b;
+    });
+
+
 
     /*snowball*/
     //ver 1. create a snowball
@@ -237,7 +265,7 @@ function meshAdd() {
 
 
     penguin = drawPeng(0, 0, -40);
-    penguin.scale.set(0.8, 0.8, 0.8);
+    penguin.scale.set(0.7, 0.7, 0.7);
     scene.add(penguin);
 
     back_bear = drawBear(-300, 0, 100);
@@ -245,34 +273,44 @@ function meshAdd() {
     scene.add(back_bear);
 
 
-
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-    random_distance = Math.random() * 500 + 300;
-    for (var a = 0; a < 5; a++) {
-        for (var i = 0; i < 5; i++) {
-            random_v.push(parseInt(Math.random() * 3));
-            random(random_v[i + a * 5], i, a);
-
+    var num = 1;
+    for (var i = 1; i < iceCount; i++) {
+        for (var j = num; j < 30; j++) {
+            if (iceLoc[i] != j) {
+                waterLoc.push(j);
+            }
+            else {
+                j++;
+                num = j;
+                break;
+            }
         }
-
-        random_distance = Math.random() * 500 + 300;
     }
 
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 188~202 번까지
+    for (var j = 0; j < iceCount; j++) {
+        random_direction = parseInt(Math.random() * 2);
+        for (var n = 0; n < 1; n++) {
+            draw_shark(waterLoc[j], random_direction, n);
+        }
+    }
 
+    for (var i = 1; i < iceCount; i++) {
+        random_direction = parseInt(Math.random() * 2);
+        for (var n = 0; n < 1; n++) {
+            draw_seal(iceLoc[i], random_direction, n);
+        }
+
+    }
     //cloud
-    for (i = 0; i < 10; i++) {
+    for (i = 0; i < 9; i++) {
         var cloud = drawCloud(500 * Math.random() * Math.pow(2, i), Math.random() * 300 * Math.pow(-1, i), Math.random() * 600);
         scene.add(cloud);
     }
-
-
     //items
-    item = drawItem(0, 0, 40);
-    scene.add(item);
-    itemList.push(item)
+    itemRandom()
 
 }
+
 
 //create water function
 function setWater() {
@@ -323,6 +361,7 @@ function init() {
     camera.position.set(-1000, -1000, 1000);
     camera.up.set(0, 0, 1);
     camera.lookAt(0, 0, 0);
+
     scene.add(camera);
 
 
@@ -349,7 +388,7 @@ function init() {
     var skybox = new THREE.Mesh(skyboxGeometry, materialArray);
 
     skybox.rotation.x = 1 * Math.PI / 2;
-    skybox.position.set(maxX / 2-50, 50, 0);
+    skybox.position.set(maxX / 2 - 50, 50, 0);
     scene.add(skybox);
 
 
@@ -372,7 +411,7 @@ function init() {
 
     //파도
     var waterObj = setWater();
-    waterObj.position.set(maxX / 2-50, 50, -80);
+    waterObj.position.set(maxX / 2 - 50, 50, -80);
     scene.add(waterObj);
 
 
@@ -389,7 +428,7 @@ function init() {
         });
     }
 
-	function playSoundBoom() {
+    function playSoundBoom() {
         var audioLoader = new THREE.AudioLoader();
         audioLoader.load("sounds/boom.mp3", function (buffer) {
             sound.setBuffer(buffer);
@@ -426,22 +465,17 @@ function init() {
                 snowballs[i].position.z = maxZ / 2 - 500;
             }
         }
+        seal_move();
+        shark_move();
 
 
-        //장애물 움직이기
-        for (var i = 0; i < 26; i++) {
-            randommove(random_v[i]);
-        }
 
-        camera.position.set(penguin.position.x - 1000, penguin.position.y - 200, 1000);
-        camera.lookAt(penguin.position.x + 300, penguin.position.y, 0);
+        // camera.position.set(penguin.position.x - 1000, penguin.position.y - 200, 1000);
+        // camera.lookAt(penguin.position.x + 300, penguin.position.y, 0);
 
-        //따라오는 곰 위치
-        if(back_bear.position.x-100>penguin.position.x){
-            playSoundBoom();
-			alert("Catch!");
-			history.back();
-        }
+        camera.position.set(penguin.position.x, penguin.position.y, 3000);
+        camera.lookAt(penguin.position.x, penguin.position.y, 0);
+
         //펭귄 움직이기
         moveForward();
         if (penguin.position.x >= maxX) {
@@ -454,24 +488,13 @@ function init() {
         {
             startPoint_bear = back_bear.position.x; //펭귄 이동이 시작한 곳
         }
-        /*
-                var pengx = penguin.position.x + pengSpeed;
-                if (pengx >= maxX) {
-                    penguin.position.x %= maxX;
-                }
-                if (startPoint + 100 < pengx-5) {
-                    startPoint = -1;
-                    lockPeng = -1;
-                    return;
-                }
-        
-                penguin.position.x = pengx;
-                pengx %= 100;
-                var pengz = -1 * (pengx - 50) * (pengx - 50) + 2500;
-                pengz /= 50;
-                penguin.position.z = pengz;
-        
-                */
+        // //따라오는 곰 위치
+        // if(back_bear.position.x>penguin.position.x){
+        //     playSoundBoom();
+        // 	alert("Catch!");
+        // 	history.back();
+        // }
+
 
         var bearx = back_bear.position.x + bearSpeed;
 
@@ -505,9 +528,9 @@ function init() {
 
         if (superPenguinState == 0) {
             if (collision() == 1) {
-				playSoundBoom();
-                alert("GAME OVER!");
-				history.back();
+                playSoundBoom();
+                alert("GAME OVER! A");
+                history.back();
             }
         }
         //item effect
@@ -521,7 +544,7 @@ function init() {
             }
             else if (itemRandNum == 1) {
                 directItem = 1;
-                
+
             }
         }
 
@@ -556,11 +579,11 @@ function init() {
         if (keyCode == 38)   //front
         {
             playSoundPenguin();
-            if(directItem==0){
+            if (directItem == 0) {
                 lockPeng = 1;//움직이는 상태로 변환
             }
-            else if(directItem==1){
-                lockPeng=0;
+            else if (directItem == 1) {
+                lockPeng = 0;
             }
 
         }
@@ -574,17 +597,39 @@ function init() {
         }
         if (t0 - t1 >= 10) {
             superPenguinState = 0;
-            penguin.scale.set(0.8, 0.8, 0.8);
+            penguin.scale.set(0.7, 0.7, 0.7);
             pengSpeed = 10;
         }
     }
 
     function checkDirect() {
         if (directItem == 1) {
-            t0 = performance.now() /1000;
+            t0 = performance.now() / 1000;
         }
         if (t0 - t1 >= 10) {
             directItem = 0;
+        }
+    }
+    function isThere(position) {
+        for (var k = 0; k < iceCount; k++) {
+            if (iceLoc[k] == position) {
+                return 1;
+            }
+        }
+        return 0;
+    }
+    function howMove(start, end) {
+        var s = isThere(start);
+        var e = isThere(end);
+
+        if (s == 1 && e == 0) {
+            return 1;//얼음에서 바다로
+        } else if (s == 0 && e == 1) {
+            return 2;//바다에서 얼음으로
+        } else if (s == 1 && e == 1) {
+            return 3;//얼음에서 얼음으로
+        } else if (s == 0 && e == 0) {
+            return 4;//바다에서 바다로
         }
     }
 
@@ -598,21 +643,61 @@ function init() {
             }
 
             var pengx = penguin.position.x + pengSpeed;
-            if (pengx >= maxX) {
+            if (pengx > maxX) {
                 penguin.position.x %= maxX;
             }
             if (startPoint + 100 < pengx - 5) {
                 startPoint = -1;
                 lockPeng = -1;
-                addPoint();
                 return;
             }
 
+            var state = howMove(startPoint / 100, startPoint / 100 + 1);
+            if (startPoint / 100 == maxY / 100 - 1)
+                state = 5;
+
+
             penguin.position.x = pengx;
-            pengx %= 100;
-            var pengz = -1 * (pengx - 50) * (pengx - 50) + 2500;
-            pengz /= 50;
-            penguin.position.z = pengz;
+            if (pengx % 100 != 0) {
+                pengx %= 100;
+            } else if (pengx % 100 == 0) {
+                pengx = 100;
+            }
+
+            switch (state) {
+                case 1://빙하에서 바다로
+                    if (pengx == 100) {
+                        penguin.position.z = -78;
+                        break;
+                    }
+                    var pengz = -1 * Math.pow((1.3 * pengx - 50), 2) + 2500;
+                    pengz /= 50;
+                    penguin.position.z = pengz;
+                    break;
+                case 2://바다에서 빙하로
+                    if (pengx == 100) {
+                        penguin.position.z = 0;
+                        break;
+                    }
+                    var tempXOffset = 100 - (100 / 1.3);
+                    var pengz = -1 * Math.pow((1.3 * (pengx - tempXOffset) - 50), 2) + 2500;
+
+                    pengz /= 50;
+                    penguin.position.z = pengz;
+                    break;
+                case 3://빙하에서 빙하로
+                    var pengz = -1 * (pengx - 50) * (pengx - 50) + 2500;
+                    pengz /= 50;
+                    penguin.position.z = pengz;
+                    break;
+                case 4://바다에서 바다로
+                    var pengz = -78
+                    penguin.position.z = pengz;
+                    break;
+                case 5:
+                    break;
+            }
+
 
         }
         else if (lockPeng == 3) { //왼쪽
@@ -633,13 +718,22 @@ function init() {
                 return;
             }
 
-            penguin.position.y = pengy;
-            if (pengy < 0)
-                pengy *= -1;
-            pengy %= 100;
-            var pengz = -1 * (pengy - 50) * (pengy - 50) + 2500;
-            pengz /= 50;
-            penguin.position.z = pengz;
+            var state = isThere(penguin.position.x / 100);
+            if (state == 1)//빙하위에서 옆으로 이동
+            {
+                penguin.position.y = pengy;
+                if (pengy < 0)
+                    pengy *= -1;
+                pengy %= 100;
+                var pengz = -1 * (pengy - 50) * (pengy - 50) + 2500;
+                pengz /= 50;
+                penguin.position.z = pengz;
+            } else {
+                penguin.position.y = pengy;
+                var pengz = -78;
+                penguin.position.z = pengz;
+            }
+
         }
         else if (lockPeng == 2) { //오른쪽
             penguin.rotation.z = - Math.PI / 2;
@@ -661,15 +755,24 @@ function init() {
                 return;
             }
 
-            penguin.position.y = pengy;
-            if (pengy < 0)
-                pengy *= -1;
-            pengy %= 100;
-            var pengz = -1 * (pengy - 50) * (pengy - 50) + 2500;
-            pengz /= 50;
-            penguin.position.z = pengz;
+
+            var state = isThere(penguin.position.x / 100);
+            if (state == 1)//빙하위에서 옆으로 이동
+            {
+                penguin.position.y = pengy;
+                if (pengy < 0)
+                    pengy *= -1;
+                pengy %= 100;
+                var pengz = -1 * (pengy - 50) * (pengy - 50) + 2500;
+                pengz /= 50;
+                penguin.position.z = pengz;
+            } else {
+                penguin.position.y = pengy;
+                var pengz = -78;
+                penguin.position.z = pengz;
+            }
         }
-        else if(lockPeng==0){
+        else if (lockPeng == 0) {//뒤
 
             penguin.rotation.z = Math.PI;
             if (startPoint == -1)//이동 시작
@@ -684,7 +787,6 @@ function init() {
             if (startPoint + 100 < pengx - 5) {
                 startPoint = -1;
                 lockPeng = -1;
-                addPoint();
                 return;
             }
 
@@ -694,11 +796,8 @@ function init() {
             pengz /= 50;
             penguin.position.z = pengz;
 
-
         }
     }
-
-
     //랜더링 시작
     animate();
 
