@@ -115,8 +115,7 @@ function collision() {
         //check intersection between two boxes
         var coll = firstBB.isIntersectionBox(secondBB);
         if (coll) {
-            //Deletes a colliding object from a list
-            collidableMeshList.splice(index, 1);
+
             return 1;
 
         }
@@ -242,9 +241,12 @@ function meshAdd() {
     iceLoc = randCom(pathWidth, iceCount);
 
     for (var i = 0; i < iceCount; i++) {
-        var ice = drawIce(iceLoc[i] * 100, 0, 0, pathWidth);
+        var ice = drawIce(0, 0, 0, pathWidth);
         icebergs.push(ice);
-        scene.add(ice);
+        scene.add(icebergs[i]);
+    }
+    for (var i = 0; i < iceCount; i++) {
+        icebergs[i].position.x = iceLoc[i] * 100;
     }
 
     iceLoc = iceLoc.sort(function (a, b) {
@@ -631,10 +633,16 @@ function init() {
             return 4;//바다에서 바다로
         }
     }
+    function resetMap() {
+        iceLoc = randCom(pathWidth, iceCount);
+        alert(iceLoc);
+        for (var l = 0; l < 15; l++) {
+            icebergs[l].position.x = iceLoc[l] * 100;
+        }
+    }
 
     function moveForward() {
-        if (lockPeng == 1) {//움직이는 상태 = 키보드 입력 받으면 안됨 = 움직이는 동작 수행
-
+        if (lockPeng == 1 || lockPeng == 0) {//앞
             penguin.rotation.z = 0;
             if (startPoint == -1)//이동 시작
             {
@@ -643,12 +651,16 @@ function init() {
 
             var pengx = penguin.position.x + pengSpeed;
             if (pengx > maxX) {
+                resetMap();
                 penguin.position.x %= maxX;
             }
             if (startPoint + 100 < pengx - 5) {
                 startPoint = -1;
                 lockPeng = -1;
-                addPoint();
+                if(collision()==0||superPenguinState==1)
+                {
+                    addPoint();
+                }
                 return;
             }
 
@@ -698,24 +710,44 @@ function init() {
                     break;
             }
 
-
         }
-        else if (lockPeng == 3) { //왼쪽
-            penguin.rotation.z = Math.PI / 2;
-            if (startPoint == -1)//이동 시작
-            {
-                startPoint = penguin.position.y;//펭귄 이동이 시작한 곳
-            }
+        else if (lockPeng == 3 || lockPeng == 2) { //왼쪽 || 오른쪽
+            if (lockPeng == 3) {
+                penguin.rotation.z = Math.PI / 2;//음수
+                if (startPoint == -1)//이동 시작
+                {
+                    startPoint = penguin.position.y;//펭귄 이동이 시작한 곳
+                }
 
-            var pengy = penguin.position.y + pengSpeed;
-            var maxRightY = maxY / 2;
-            if (pengy >= maxRightY) {
-                return;
-            }
-            if (startPoint + 100 < pengy - 5) {
-                startPoint = -1;
-                lockPeng = -1;
-                return;
+                var pengy = penguin.position.y + pengSpeed;//음수
+                var maxRightY = maxY / 2;//음수
+                if (pengy >= maxRightY) {//조건다름
+                    return;
+                }
+                if (startPoint + 100 < pengy - 5) {//빼기랑 부호 반대
+                    startPoint = -1;
+                    lockPeng = -1;
+                    return;
+                }
+            } else if (lockPeng == 2) {
+                penguin.rotation.z = -Math.PI / 2;
+                if (startPoint == -1)//이동 시작
+                {
+                    startPoint = penguin.position.y;//펭귄 이동이 시작한 곳
+                }
+
+                var pengy = penguin.position.y - pengSpeed;
+                var maxRightY = (maxY / 2) * -1;
+
+                if (pengy < maxRightY + 100) {
+                    return;
+                }
+
+                if (startPoint - 100 > pengy + 5) {
+                    startPoint = -1;
+                    lockPeng = -1;
+                    return;
+                }
             }
 
             var state = isThere(penguin.position.x / 100);
@@ -733,70 +765,6 @@ function init() {
                 var pengz = -78;
                 penguin.position.z = pengz;
             }
-
-        }
-        else if (lockPeng == 2) { //오른쪽
-            penguin.rotation.z = - Math.PI / 2;
-            if (startPoint == -1)//이동 시작
-            {
-                startPoint = penguin.position.y;//펭귄 이동이 시작한 곳
-            }
-
-            var pengy = penguin.position.y - pengSpeed;
-            var maxRightY = (maxY / 2) * -1;
-
-            if (pengy < maxRightY + 100) {
-                return;
-            }
-
-            if (startPoint - 100 > pengy + 5) {
-                startPoint = -1;
-                lockPeng = -1;
-                return;
-            }
-
-
-            var state = isThere(penguin.position.x / 100);
-            if (state == 1)//빙하위에서 옆으로 이동
-            {
-                penguin.position.y = pengy;
-                if (pengy < 0)
-                    pengy *= -1;
-                pengy %= 100;
-                var pengz = -1 * (pengy - 50) * (pengy - 50) + 2500;
-                pengz /= 50;
-                penguin.position.z = pengz;
-            } else {
-                penguin.position.y = pengy;
-                var pengz = -78;
-                penguin.position.z = pengz;
-            }
-        }
-        else if (lockPeng == 0) {//뒤
-
-            penguin.rotation.z = Math.PI;
-            if (startPoint == -1)//이동 시작
-            {
-                startPoint = penguin.position.x;//펭귄 이동이 시작한 곳
-            }
-
-            var pengx = penguin.position.x + pengSpeed;
-            if (pengx >= maxX) {
-                penguin.position.x %= maxX;
-            }
-            if (startPoint + 100 < pengx - 5) {
-                startPoint = -1;
-                lockPeng = -1;
-                addPoint();
-                return;
-            }
-
-            penguin.position.x = pengx;
-            pengx %= 100;
-            var pengz = -1 * (pengx - 50) * (pengx - 50) + 2500;
-            pengz /= 50;
-            penguin.position.z = pengz;
-
         }
     }
     //랜더링 시작
