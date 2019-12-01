@@ -5,47 +5,144 @@
 	<link rel="stylesheet" href="style.css">
 	<script src="three.js"></script>
 	<style>
-		#btn{
-			border-top-left-radius: 5px; 
-			border-bottom-left-radius: 5px; 
-			border-top-right-radius: 5px; 
-			border-bottom-right-radius: 5px; 
-			border: 1px solid skyblue; 
-			background-color: rgba(0,0,0,0); 
-			color: skyblue; 
-			padding: 5px; 
-			width:600px;
+		#btn {
+			border-top-left-radius: 5px;
+			border-bottom-left-radius: 5px;
+			border-top-right-radius: 5px;
+			border-bottom-right-radius: 5px;
+			border: 1px solid skyblue;
+			background-color: rgba(0, 0, 0, 0);
+			color: skyblue;
+			font-size: 15px;
+			font-family: Arial, Helvetica, sans-serif;
+			padding: 5px;
+			width: 600px;
+		}
+		#btn2 {
+			border-top-left-radius: 5px;
+			border-bottom-left-radius: 5px;
+			border-top-right-radius: 5px;
+			border-bottom-right-radius: 5px;
+			border: 1px solid skyblue;
+			background-color: rgba(0, 0, 0, 0);
+			color: skyblue;
+			font-size: 15px;
+			font-family: Arial, Helvetica, sans-serif;
+			padding: 5px;
+			width: 100px;
 		}
 
+		#dialogoverlay {
+			display: none;
+			opacity: .8;
+			position: fixed;
+			top: 0px;
+			left: 0px;
+			background: #FFF;
+			width: 100%;
+			z-index: 10;
+		}
+
+		#dialogbox {
+			display: none;
+			position: fixed;
+			background: rgba(132, 220, 223, 0.87);
+			border-radius: 7px;
+			width: 350px;
+			z-index: 10;
+		}
+
+		#dialogbox>div {
+			background: #FFF;
+			margin: 8px;
+		}
+
+		#dialogbox>div>#dialogboxhead {
+			background: #FFF;
+			font-size: 20px;
+			padding: 10px;
+			font-family: Arial, Helvetica, sans-serif;
+			color: rgba(132, 220, 223, 0.87);
+			text-align:center
+		}
+
+		#dialogbox>div>#dialogboxbody {
+			background: rgba(132, 220, 223, 0.87);
+			padding: 20px;
+			font-size: 25px;
+			font-family: Arial, Helvetica, sans-serif;
+			color: #FFF;
+			text-align:center
+		}
+
+		#dialogbox>div>#dialogboxfoot {
+			background: #FFF;
+			padding: 10px;
+			text-align: center;
+		}
 	</style>
+	<script>
+		function CustomAlert() {
+			this.render = function (dialog) {
+				var winW = window.innerWidth;
+				var winH = window.innerHeight;
+				var dialogoverlay = document.getElementById('dialogoverlay');
+				var dialogbox = document.getElementById('dialogbox');
+				dialogoverlay.style.display = "block";
+				dialogoverlay.style.height = winH + "px";
+				dialogbox.style.left = (winW / 2) - (550 * .5) + "px";
+				dialogbox.style.top = "100px";
+				dialogbox.style.display = "block";
+				document.getElementById('dialogboxhead').innerHTML = "Game Over";
+				document.getElementById('dialogboxbody').innerHTML = dialog;
+				document.getElementById('dialogboxfoot').innerHTML = '<button id="btn2" onclick="Alert.ok()">OK</button>';
+			}
+			this.ok = function () {
+				document.getElementById('dialogbox').style.display = "none";
+				document.getElementById('dialogoverlay').style.display = "none";
+				location.href = "firstScreen.html"
+			}
+		}
+		var Alert = new CustomAlert();
+
+	</script>
 
 </head>
 
 <body>
-   <audio autoplay>
-	<source src="sounds/mainaudio.mp3" type="audio/mpeg">
-   </audio>
+	<audio autoplay>
+		<source src="sounds/mainaudio.mp3" type="audio/mpeg">
+	</audio>
 
 	<div>
 		<center>
 			<button id="btn">
-					<h3 id="scoreBoard"></h3>
+				<h3 id="scoreBoard"></h3>
 			</button>
 			<div id="container"></div>
 
 		</center>
+	</div>
+	<div id="dialogoverlay"></div>
+	<div id="dialogbox">
+		<div>
+			<div id="dialogboxhead"></div>
+			<div id="dialogboxbody"></div>
+			<div id="dialogboxfoot"></div>
+		</div>
+	</div>
 
+	<script src='objects/seal.js'></script>
+	<script src='objects/penguin.js'></script>
+	<script src='objects/bear.js'></script>
+	<script src='objects/shark.js'></script>
+	<script src='objects/ice.js'></script>
+	<script src='objects/snowball.js'></script>
+	<script src='objects/cloud.js'></script>
+	<script src='objects/item.js'></script>
 
-		<script src='objects/seal.js'></script>
-		<script src='objects/penguin.js'></script>
-		<script src='objects/bear.js'></script>
-		<script src='objects/shark.js'></script>
-		<script src='objects/ice.js'></script>
-		<script src='objects/snowball.js'></script>
-		<script src='objects/cloud.js'></script>
-		<script src='objects/item.js'></script>
+	<script src="main.js"></script>
 
-		<script src="main.js"></script>
 
 </body>
 

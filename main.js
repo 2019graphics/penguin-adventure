@@ -58,7 +58,7 @@ function addPoint() {
 }
 //update state of scoreboard
 function updateScoreBoard() {
-    scoreBoard.innerHTML = 'Score: ' + score + '(Stage: ' + stage + ')';
+    scoreBoard.innerHTML = 'Score: ' + score + ' (Stage: ' + stage + ')';
 }
 //ice position random select
 function randCom(total, object) {
@@ -126,18 +126,19 @@ function collision() {
 }
 //create items
 function itemRandom() {
+    var randX=randCom(maxX/100,3);
+    var randY=randCom(pathWidth,3);
+    var c=[-1,1];
+
     for (i = 0; i < 3; i++) {
-        var randX = getRandomArbitrary(1, 28);   //시작 두번째칸부터 마지막에서 두번째칸까지: (0 ~ 2900)
-        var randY = getRandomArbitrary(-14, 13);   //시작 두번째칸부터 마지막에서 두번째칸까지 (-1500 ~ 1400)
-
-        console.log('x', randX, 'y', randY)
-
-        item = drawItem(randX * 100, randY * 100, 0);
+        j=Math.floor(Math.random() * 2);//0-1 
+        itemX=(randX[i]+1)*100;
+        itemY=Math.floor(randY[i]/2)*100*c[j];
+        item = drawItem(itemX, itemY, 0);
+        item.scale.set(0.7,0.7,0.7);
         scene.add(item);
         itemList.push(item);
     }
-
-    console.log('itemList', itemList)
 }
 function getRandomArbitrary(min, max) {
     return Math.random() * (max - min) + min;
@@ -473,7 +474,7 @@ function init() {
         // camera.position.set(penguin.position.x - 1000, penguin.position.y - 200, 1000);
         // camera.lookAt(penguin.position.x + 300, penguin.position.y, 0);
 
-        camera.position.set(penguin.position.x, penguin.position.y, 3000);
+        camera.position.set(penguin.position.x, penguin.position.y, 4000);
         camera.lookAt(penguin.position.x, penguin.position.y, 0);
 
         //펭귄 움직이기
@@ -524,13 +525,11 @@ function init() {
         renderer.render(scene, camera);
 
         //충돌하면 return 1 그리고 list에서 해당 object 제외.
-
-
         if (superPenguinState == 0) {
             if (collision() == 1) {
                 playSoundBoom();
-                alert("GAME OVER! A");
-                history.back();
+                var Alert = new CustomAlert();
+                Alert.render("Score : "+score);
             }
         }
         //item effect
@@ -649,6 +648,7 @@ function init() {
             if (startPoint + 100 < pengx - 5) {
                 startPoint = -1;
                 lockPeng = -1;
+                addPoint();
                 return;
             }
 
@@ -787,6 +787,7 @@ function init() {
             if (startPoint + 100 < pengx - 5) {
                 startPoint = -1;
                 lockPeng = -1;
+                addPoint();
                 return;
             }
 
